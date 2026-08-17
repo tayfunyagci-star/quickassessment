@@ -1,0 +1,40 @@
+# =========================================================
+# Scale Teknoloji — Hızlı Değerlendirme (scaleteknoloji.com/degerlendirme/)
+# Güvenlik yapılandırması (Apache / LiteSpeed)
+# infosec/.htaccess ile aynı temele dayanır; tek farkı, anketin
+# aynı origin'deki /otp-servisi.php ucuna XHR yapabilmesidir
+# (connect-src 'self' bunu zaten kapsar).
+# =========================================================
+
+Options -Indexes
+
+<FilesMatch "^\.">
+  Require all denied
+</FilesMatch>
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=()"
+  Header always set X-XSS-Protection "0"
+  Header always set Cross-Origin-Opener-Policy "same-origin"
+  Header always set Cross-Origin-Resource-Policy "same-origin"
+  Header always set Strict-Transport-Security "max-age=31536000"
+
+  # Satır içi script kullanılmaz; anket motoru degerlendirme.js dosyasındadır.
+  # connect-src 'self' → /otp-servisi.php çağrısı aynı origin olduğu için serbesttir.
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests"
+
+  Header always unset X-Powered-By
+</IfModule>
+
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/css "access plus 7 days"
+  ExpiresByType application/javascript "access plus 7 days"
+  ExpiresByType image/png "access plus 30 days"
+  ExpiresByType text/html "access plus 0 seconds"
+</IfModule>
+
+AddDefaultCharset UTF-8

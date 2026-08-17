@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<!--
+  SCALE TEKNOLOJİ — DOĞRULAMA KODU E-POSTA ŞABLONU
+  ================================================
+  Kullanım: Gönderim servisiniz aşağıdaki yer tutucuları değiştirip HTML gövdesi olarak yollar.
+    {{KOD}}        → 6 haneli doğrulama kodu (örn. 483920)
+    {{EPOSTA}}     → alıcının e-posta adresi
+    {{GECERLILIK}} → kodun geçerlilik süresi (örn. 10 dakika)
+    {{YIL}}        → telif yılı (örn. 2026)
+    {{BAGLAM}}     → kodun hangi akış için istendiği
+                     ("Scale Yükümlülük Kataloğu" veya "Scale Hızlı Değerlendirme")
+  Önerilen konu satırı: "Doğrulama kodunuz: {{KOD}} — {{BAGLAM}}"
+  Not: E-posta istemcileri (özellikle Outlook) için tablo tabanlı ve satır içi stilli hazırlanmıştır;
+  harici CSS/JS ve web fontu kullanılmaz.
+-->
+<html lang="tr" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>Doğrulama Kodunuz</title>
+<!--[if mso]><style>table,td,div,p,a{font-family:Arial,Helvetica,sans-serif !important}</style><![endif]-->
+</head>
+<body style="margin:0;padding:0;background-color:#f0ede6;">
+  <!-- Ön izleme metni (gelen kutusunda konunun yanında görünür, gövdede görünmez) -->
+  <div style="display:none;font-size:1px;color:#f0ede6;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;">
+    {{BAGLAM}} için doğrulama kodunuz: {{KOD}} (geçerlilik: {{GECERLILIK}})
+  </div>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f0ede6;">
+    <tr><td align="center" style="padding:32px 16px;">
+
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:100%;">
+
+        <!-- ÜST BANT / MARKA -->
+        <tr>
+          <td bgcolor="#0d1f2d" style="background:linear-gradient(135deg,#0d1f2d,#14555a);background-color:#0d1f2d;border-radius:16px 16px 0 0;padding:34px 40px 30px 40px;" align="center">
+            <div style="font-family:Arial,Helvetica,sans-serif;font-size:11px;letter-spacing:3px;color:#8fb8b1;text-transform:uppercase;padding-bottom:10px;">
+              {{BAGLAM}}
+            </div>
+            <div style="font-family:Arial,Helvetica,sans-serif;font-size:22px;font-weight:bold;color:#ffffff;">
+              Scale Teknoloji ve Danışmanlık
+            </div>
+          </td>
+        </tr>
+
+        <!-- GÖVDE -->
+        <tr>
+          <td bgcolor="#ffffff" style="background-color:#ffffff;padding:40px 40px 8px 40px;" align="center">
+            <div style="font-family:Arial,Helvetica,sans-serif;font-size:20px;font-weight:bold;color:#0d1f2d;padding-bottom:12px;">
+              E-postanızı doğrulayın
+            </div>
+            <div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:22px;color:#5a6a76;padding-bottom:26px;">
+              Devam edebilmek için e-posta adresinizi doğrulamamız gerekiyor. Bunun için
+              aşağıdaki doğrulama kodunu ekrana girin.
+            </div>
+
+            <!-- KOD KUTUSU -->
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center">
+              <tr>
+                <td bgcolor="#eef7f4" style="background-color:#eef7f4;border:2px solid #1c8c7a;border-radius:14px;padding:18px 42px;" align="center">
+                  <div style="font-family:'Courier New',Courier,monospace;font-size:38px;font-weight:bold;letter-spacing:12px;color:#0d1f2d;">{{KOD}}</div>
+                </td>
+              </tr>
+            </table>
+
+            <div style="font-family:Arial,Helvetica,sans-serif;font-size:12.5px;color:#8a9198;padding:18px 0 6px 0;">
+              Bu kod <b style="color:#14555a;">{{GECERLILIK}}</b> boyunca geçerlidir ve yalnızca bir kez kullanılabilir.
+            </div>
+          </td>
+        </tr>
+
+        <!-- BİLGİ NOTU -->
+        <tr>
+          <td bgcolor="#ffffff" style="background-color:#ffffff;padding:18px 40px 34px 40px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td bgcolor="#fdf6e3" style="background-color:#fdf6e3;border-left:4px solid #d9a441;border-radius:6px;padding:12px 16px;">
+                  <div style="font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:19px;color:#7a5c14;">
+                    Bu talebi siz yapmadıysanız bu e-postayı yok sayabilirsiniz; kodunuzu kimseyle
+                    paylaşmayın. Scale Teknoloji ekibi sizden hiçbir zaman e-posta veya telefonla
+                    doğrulama kodu istemez.
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- AYRAÇ + RAPOR ÖZETİ İPUCU -->
+        <tr>
+          <td bgcolor="#ffffff" style="background-color:#ffffff;padding:0 40px 34px 40px;" align="center">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr><td style="border-top:1px dashed #e6e0d6;padding-top:22px;" align="center">
+                <div style="font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:21px;color:#5a6a76;">
+                  Kodu doğruladıktan sonra raporunuzda şunları bulacaksınız:<br>
+                  <span style="color:#14555a;font-weight:bold;">tabi olduğunuz mevzuat</span> ·
+                  <span style="color:#14555a;font-weight:bold;">takvimli yükümlülükler</span> ·
+                  <span style="color:#14555a;font-weight:bold;">risk analizi</span> ·
+                  <span style="color:#14555a;font-weight:bold;">çözüm önerilerimiz</span>
+                </div>
+              </td></tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- ALT BİLGİ -->
+        <tr>
+          <td bgcolor="#0d1f2d" style="background-color:#0d1f2d;border-radius:0 0 16px 16px;padding:26px 40px;" align="center">
+            <div style="font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:bold;color:#ffffff;padding-bottom:6px;">
+              Scale Teknoloji ve Danışmanlık
+            </div>
+            <div style="font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:17px;color:#8fa3ad;">
+              Bu e-posta, {{BAGLAM}} akışı sırasında {{EPOSTA}} adresini
+              girmeniz üzerine otomatik gönderilmiştir.<br>
+              Kişisel verileriniz 6698 sayılı KVKK kapsamında işlenmektedir ·
+              <a href="#" style="color:#8fb8b1;text-decoration:underline;">Aydınlatma Metni</a><br>
+              © {{YIL}} Scale Teknoloji ve Danışmanlık. Tüm hakları saklıdır.
+            </div>
+          </td>
+        </tr>
+
+      </table>
+
+    </td></tr>
+  </table>
+</body>
+</html>

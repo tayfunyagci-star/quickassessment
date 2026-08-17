@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<!--
+  SCALE TEKNOLOJİ — HIZLI DEĞERLENDİRME PAKETİ BİLDİRİMİ (şirkete gider)
+  =====================================================================
+  Yer tutucular: {{KURUM}} {{EPOSTA}} {{TELEFON}} {{TAKSONOMI}} {{ALAN_SAYISI}}
+                 {{SORU_SAYISI}} {{BANKA}} {{DOSYA}} {{TARIH}} {{YIL}}
+  Şifreli cevap paketi bu e-postaya EK olarak iliştirilir.
+  Paketi açan şifre bu e-postada YER ALMAZ — ziyaretçi ayrı bir kanaldan iletir.
+  Yanıtla (Reply-To) başlığı ziyaretçinin adresine ayarlanır.
+-->
+<html lang="tr" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hızlı Değerlendirme Paketi</title>
+<!--[if mso]><style>table,td,div,p,a{font-family:Arial,Helvetica,sans-serif !important}</style><![endif]-->
+</head>
+<body style="margin:0;padding:0;background-color:#f0ede6;">
+  <div style="display:none;font-size:1px;color:#f0ede6;max-height:0;overflow:hidden;">Yeni şifreli değerlendirme paketi: {{KURUM}} · {{EPOSTA}} · {{SORU_SAYISI}} soru</div>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f0ede6;">
+    <tr><td align="center" style="padding:32px 16px;">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:100%;">
+
+        <tr>
+          <td bgcolor="#0d1f2d" style="background:linear-gradient(135deg,#0d1f2d,#14555a);background-color:#0d1f2d;border-radius:16px 16px 0 0;padding:28px 40px;" align="center">
+            <div style="font-family:Arial,Helvetica,sans-serif;font-size:11px;letter-spacing:3px;color:#8fb8b1;text-transform:uppercase;padding-bottom:8px;">Hızlı Değerlendirme · Yeni Paket</div>
+            <div style="font-family:Arial,Helvetica,sans-serif;font-size:21px;font-weight:bold;color:#ffffff;">{{KURUM}}</div>
+          </td>
+        </tr>
+
+        <tr>
+          <td bgcolor="#ffffff" style="background-color:#ffffff;padding:30px 40px 10px 40px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;font-size:13.5px;color:#22303a;">
+              <tr>
+                <td style="padding:9px 0;border-bottom:1px solid #eee8dc;width:180px;color:#8a9198;">Doğrulanmış e-posta</td>
+                <td style="padding:9px 0;border-bottom:1px solid #eee8dc;font-weight:bold;"><a href="mailto:{{EPOSTA}}" style="color:#14555a;">{{EPOSTA}}</a></td>
+              </tr>
+              <tr>
+                <td style="padding:9px 0;border-bottom:1px solid #eee8dc;color:#8a9198;">Telefon</td>
+                <td style="padding:9px 0;border-bottom:1px solid #eee8dc;font-weight:bold;">{{TELEFON}}</td>
+              </tr>
+              <tr>
+                <td style="padding:9px 0;border-bottom:1px solid #eee8dc;color:#8a9198;">Kontrol çerçevesi</td>
+                <td style="padding:9px 0;border-bottom:1px solid #eee8dc;color:#14555a;font-weight:bold;">{{TAKSONOMI}}</td>
+              </tr>
+              <tr>
+                <td style="padding:9px 0;border-bottom:1px solid #eee8dc;color:#8a9198;">Kapsam</td>
+                <td style="padding:9px 0;border-bottom:1px solid #eee8dc;"><b>{{ALAN_SAYISI}}</b> kontrol alanı · <b>{{SORU_SAYISI}}</b> kontrol sorusu</td>
+              </tr>
+              <tr>
+                <td style="padding:9px 0;border-bottom:1px solid #eee8dc;color:#8a9198;">Soru bankası</td>
+                <td style="padding:9px 0;border-bottom:1px solid #eee8dc;">{{BANKA}}</td>
+              </tr>
+              <tr>
+                <td style="padding:9px 0;border-bottom:1px solid #eee8dc;color:#8a9198;">Ek dosya</td>
+                <td style="padding:9px 0;border-bottom:1px solid #eee8dc;font-family:Consolas,Menlo,monospace;font-size:12.5px;">{{DOSYA}}</td>
+              </tr>
+              <tr>
+                <td style="padding:9px 0;color:#8a9198;">Gönderim tarihi</td>
+                <td style="padding:9px 0;">{{TARIH}}</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <tr>
+          <td bgcolor="#ffffff" style="background-color:#ffffff;padding:14px 40px 6px 40px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr><td bgcolor="#fbf4e7" style="background-color:#fbf4e7;border-left:4px solid #c98a3b;border-radius:0 10px 10px 0;padding:14px 16px;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:21px;color:#6b583e;">
+                <b>Paket şifrelidir.</b> Ekteki dosya AES-256-GCM ile şifrelenmiştir ve 8 haneli şifresi
+                <b>bu e-postada yer almaz</b>. Ziyaretçi şifreyi telefon veya SMS ile ayrıca iletir.
+                Çözmek için dosyayı <b>Siber Olgunluk Analiz Paneli</b> → <i>Sonuç Yükle</i> ekranına sürükleyip şifreyi girin.
+              </td></tr>
+            </table>
+          </td>
+        </tr>
+
+        <tr>
+          <td bgcolor="#ffffff" style="background-color:#ffffff;padding:24px 40px 32px 40px;" align="center">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+              <td bgcolor="#1c8c7a" style="background-color:#1c8c7a;border-radius:10px;" align="center">
+                <a href="mailto:{{EPOSTA}}?subject=Hızlı Değerlendirme sonucunuz — Scale Bilgi Güvenliği" style="display:inline-block;padding:12px 30px;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:bold;color:#ffffff;text-decoration:none;">Ziyaretçiyi Yanıtla →</a>
+              </td>
+            </tr></table>
+            <div style="font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#8a9198;padding-top:10px;">Bu e-postayı doğrudan yanıtlamanız da ziyaretçiye gider (Reply-To ayarlıdır).</div>
+          </td>
+        </tr>
+
+        <tr>
+          <td bgcolor="#0d1f2d" style="background-color:#0d1f2d;border-radius:0 0 16px 16px;padding:20px 40px;" align="center">
+            <div style="font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:17px;color:#8fa3ad;">
+              Hızlı Değerlendirme otomatik paket bildirimi · © {{YIL}} Scale Teknoloji ve Danışmanlık
+            </div>
+          </td>
+        </tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>
