@@ -1,0 +1,33 @@
+SİTEYE GİDECEKLER — Hızlı Değerlendirme (site sürümü)
+=====================================================
+Üretim tarihi : 2026-08-17 08:24:39
+Sürüm etiketi : 20260817
+Çerçeve       : UCT Kontrol Taksonomisi
+Soru bankası  : UCT v3 · 440 kontrol · eksen-nötr · 2026-08
+Kapsam        : 11 kontrol alanı · havuzda 440 madde · 23-30 kontrol sorusu
+
+1) Bu klasördeki iki dosyayı şuraya kopyalayın:
+     Scale_Technology_Group/degerlendirme/
+       hizli-degerlendirme.html
+       degerlendirme.js
+
+2) Klasörde ZATEN BULUNMASI GEREKENLER (bu ZIP'e konmaz; siteyle birlikte
+   güncellenir, buradan kopyalanırsa sürümler ayrışır):
+       style.css · script.js · logo-icon.png
+       favicon-32.png · favicon-180.png · favicon-512.png
+       .htaccess · index.html
+
+3) Gönderim servisi sitenin KÖKÜNDE olmalıdır:
+       scaleteknoloji.com/otp-servisi.php
+   Anketin çağırdığı adres: ../otp-servisi.php
+   Paketin gideceği adres : webrequest@scaleteknoloji.com
+   Servisin yanında bulunması gereken şablonlar:
+       mail-sablonu-dogrulama-kodu.html
+       mail-sablonu-degerlendirme.html
+       mail-sablonu-degerlendirme-teyit.html
+
+4) Yayına aldıktan sonra sayfayı açıp konsolda hata olmadığını doğrulayın.
+   Servisi tarayıcıda GET ile açarsanız durum raporu JSON'u dönmelidir.
+
+NOT: Anketi açan şifre sunucuya HİÇBİR ZAMAN gönderilmez; ziyaretçinin
+ekranında gösterilir ve ayrı bir kanaldan (telefon/SMS) iletilir.
