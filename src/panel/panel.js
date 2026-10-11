@@ -237,7 +237,7 @@ function computeResults(sub){
   });
 
   /* --- bağlamsal çelişki taraması (arketip tabanlı, taksonomiden bağımsız) --- */
-  const contraMap = contradictionsByQuestion(allQ.map(q => ({ id:q.id, area:q.area, arch:q.arch, mean:q.rq })));
+  const contraMap = contradictionsByQuestion(allQ.map(q => ({ id:q.id, area:q.area, arch:q.arch, mean:q.rq, r:q.r, ml:q.ml, q:q.q })));
   allQ.forEach(q => {
     const hits = contraMap[q.id] || [];
     q.contra = hits;
@@ -1961,6 +1961,7 @@ document.getElementById("btnCsv").addEventListener("click", () => {
 function renderMethod(){
   const W = getW();
   document.getElementById("depCount").textContent = BANK.deps.length;
+  document.getElementById("contraCount").textContent = CONTRA_RULES.length;
   document.getElementById("lockThreshold").value = W.lock;
   document.getElementById("critBody").innerHTML = [1,2,3,4].map(k =>
     '<tr><td class="nm">' + CRIT_LABEL[k] + '</td><td><input type="number" min="0" max="10" step="0.5" value="' + W.crit[k] + '" data-ck="' + k + '" style="width:80px"></td>' +

@@ -196,6 +196,15 @@
       <h3 style="font-size:1rem">Bağımlılık kapıları</h3>
       <p style="font-size:.88rem">Master sette tanımlı <span class="mono" id="depCount">—</span> bağımlılık kenarı kullanılır: bir madde, aynı kontrol başlığındaki bir alt olgunluk maddesi karşılanmadan yüksek puan alamaz. Ön koşul maddesinin normalize skoru eşiğin altındaysa (varsayılan 0,50), bağımlı maddenin cevabı ön koşulun cevabına indirgenir ve raporda işaretlenir.</p>
       <hr class="hr">
+      <h3 style="font-size:1rem">Tutarsızlık kontrolleri</h3>
+      <p style="font-size:.88rem">Cevaplar üç düzeyde çapraz kontrol edilir; işaretlenen sorular <b>Kanıt İncelemesi</b>'nde karar verilene kadar skora girmez.
+        <b>Aynı konuda çelişkili beyan:</b> aynı kontrol alanında aynı konu ailesindeki (arketip) iki sorudan temel olanında bir yetenek «yok» (1/5) beyan edilirken
+        diğerinde aynı boyut 4/5 ve üzeri, ya da temel soru genel olarak yok (ortalama ≤ 1,5) iken diğerinde herhangi bir boyut 3/5 ve üzeri beyan edilirse
+        (ör. «envanter oluşturulmamış» ↔ «varlık sahipleri yazılı olarak atanmış»).
+        <b>Konular arası ön koşul:</b> <span class="mono" id="contraCount">—</span> kural, bir ön koşul yeteneği yokken (ortalama ≤ 2) ona dayanan yeteneğin
+        üst düzeyde (ortalama ≥ 4) beyan edilmesini yakalar (ör. envanter yokken olgun risk yönetimi).
+        <b>Örüntü ve anomali:</b> boyutlar arası aşırı fark, basamak tersliği, düz çizgi cevaplama ve kapsam dışı yoğunluğu raporlanır.</p>
+      <hr class="hr">
       <h3 style="font-size:1rem">Olgunluk basamağı kilidi</h3>
       <p style="font-size:.88rem">Olgunluk seviyesi düz bir ortalamayla değil, <b>merdiven mantığıyla</b> belirlenir: bir seviyenin doğrulanmış sayılması için o basamağın ve altındaki tüm ölçülmüş basamakların ağırlıklı skorunun eşiği geçmesi gerekir. Eşiği geçemeyen <b>ilk</b> basamak merdiveni durdurur; üst basamaklar tam puan alsa bile doğrulanmış seviye orada takılı kalır. Ölçülmemiş basamak kilidi tetiklemez, ancak doğrulanmış seviye en yüksek ölçülmüş ve geçilmiş basamakla sınırlıdır. Kilit hem genel skora hem her kontrol alanına ayrı uygulanır.</p>
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:.88rem">

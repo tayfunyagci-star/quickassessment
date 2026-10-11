@@ -207,10 +207,56 @@ function contradictions(answers, opts){
   return out;
 }
 
+/* =====================================================================
+   AYNI KONU ÇELİŞKİSİ
+   Aynı kontrol alanında aynı arketipteki (aynı konu ailesindeki) iki soru
+   karşılaştırılır. Temel soruda (olgunluk basamağı diğerinden yüksek
+   olmayan) bir yetenek «yok» beyan edilirken diğer soruda aynı yeteneğin
+   işlediği beyan edilirse bulgu yüksek beyanlı soruya iliştirilir:
+     · aynı boyut   : temelde boyut = 1/5, diğerinde aynı boyut ≥ 4/5
+     · genel yokluk : temelin kapsam içi ortalaması ≤ 1,5 iken diğerinde
+                      herhangi bir boyut ≥ 3/5
+   Örnek: «envanter oluşturulmamış» (Süreç 1/5) ↔ «varlık sahipleri yazılı
+   olarak atanmış» (İnsan 3/5).
+   answers: [{id, area, arch, mean, r:{I,S,T}, ml, q}]
+   ===================================================================== */
+var TOPIC_AXIS_HIGH = 4, TOPIC_ABSENT_MEAN = 1.5, TOPIC_CROSS_HIGH = 3;
+var AXIS_TR_ = { I:"İnsan", S:"Süreç", T:"Teknoloji" };
+function shortQ_(s){ s = String(s || ""); return s.length > 90 ? s.slice(0, 88) + "…" : s; }
+function topicContradictions(answers){
+  var list = (answers || []).filter(function(a){ return a && a.r && a.mean != null && a.arch; });
+  var groups = {}, out = [];
+  list.forEach(function(a){ var k = a.area + "|" + a.arch; (groups[k] = groups[k] || []).push(a); });
+  Object.keys(groups).forEach(function(k){
+    var g = groups[k];
+    g.forEach(function(a){
+      g.forEach(function(b){
+        if(a === b || a.id === b.id || (a.ml || 0) > (b.ml || 0)) return;
+        var same = AXES_.filter(function(ax){ return a.r[ax] === 1 && b.r[ax] >= TOPIC_AXIS_HIGH; });
+        var absent = a.mean <= TOPIC_ABSENT_MEAN;
+        var cross = (!same.length && absent) ? AXES_.filter(function(ax){ return b.r[ax] >= TOPIC_CROSS_HIGH; }) : [];
+        if(!same.length && !cross.length) return;
+        var msg = same.length
+          ? "«" + shortQ_(a.q || a.id) + "» sorusunda " + same.map(function(ax){ return AXIS_TR_[ax]; }).join(", ") +
+            " boyutunda yetenek «yok» (1/5) beyan edilmişken, aynı konudaki bu soruda aynı boyut " +
+            same.map(function(ax){ return b.r[ax] + "/5"; }).join(", ") + " beyan edilmiş. Temeli bulunmayan bir yeteneğin bu düzeyde işlemesi beklenmez."
+          : "«" + shortQ_(a.q || a.id) + "» sorusunda bu konudaki yetenek genel olarak «yok» beyan edilmişken (ortalama " +
+            a.mean.toFixed(1).replace(".", ",") + "/5), aynı konudaki bu soruda " +
+            cross.map(function(ax){ return AXIS_TR_[ax] + " " + b.r[ax] + "/5"; }).join(", ") +
+            " beyan edilmiş. Var olmayan bir yeteneğin sahiplik, süreç veya araç düzeyinde işlemesi beklenmez.";
+        out.push({ id:"KONU", kind:"topic", label:"Aynı konuda çelişkili beyan", msg:msg,
+                   preAvg:a.mean, depAvg:b.mean, preArch:[a.arch], depArch:[b.arch],
+                   preIds:[a.id], depIds:[b.id], axes: same.length ? same : cross, mode: same.length ? "axis" : "absent" });
+      });
+    });
+  });
+  return out;
+}
+
 /* Bulguları soru kimliğine indirger: {soruId: [bulgu, ...]} */
 function contradictionsByQuestion(answers, opts){
   var map = {};
-  contradictions(answers, opts).forEach(function(c){
+  contradictions(answers, opts).concat(topicContradictions(answers)).forEach(function(c){
     c.depIds.forEach(function(id){ (map[id] = map[id] || []).push(c); });
   });
   return map;
@@ -219,5 +265,5 @@ function contradictionsByQuestion(answers, opts){
 if(typeof module !== "undefined" && module.exports){
   module.exports = { ANOMALY_DEFS:ANOMALY_DEFS, questionAnomalies:questionAnomalies, areaAnomalies:areaAnomalies,
                      CONTRA_RULES:CONTRA_RULES, contradictions:contradictions,
-                     contradictionsByQuestion:contradictionsByQuestion };
+                     topicContradictions:topicContradictions, contradictionsByQuestion:contradictionsByQuestion };
 }

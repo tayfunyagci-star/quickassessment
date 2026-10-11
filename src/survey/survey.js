@@ -35,6 +35,8 @@ SURVEY.areas.forEach(a => AREA_META[a.c] = a);
 const FULL_AREAS = SURVEY.areas;              /* alan adları (bilgi şeridi için) */
 /* m = olgunluk basamağı (akışın yukarı/aşağı adımı), p = öncelik sırası */
 const ITEMS = SURVEY.items.map(x => ({ id:x.id, t:x.t, q:x.q, arch:x.arch, k:x.k, m:x.m, w:x.p }));
+const ITEM_BY_ID = {};
+ITEMS.forEach(x => ITEM_BY_ID[x.id] = x);
 
 /* Çalışma anında kapsam cevaplarına göre kurulan alan listesi */
 let AREAS = [];
@@ -350,14 +352,15 @@ function answeredSoFar(extra){
     Object.keys(d.results).forEach(code => {
       (d.results[code].items || []).forEach(it => {
         const m = meanR(it.r);
-        if(m != null) out.push({ id:it.id, area:code, arch:it.arch, mean:m });
+        const src = ITEM_BY_ID[it.id] || {};
+        if(m != null) out.push({ id:it.id, area:code, arch:src.arch, mean:m, r:it.r, ml:src.m, q:src.q });
       });
     });
     const area = d.areas[d.areaPtr];
     if(area) (d.current || []).forEach(x => {
       if(x.r == null) return;
       const p = area.pool[x.i];
-      out.push({ id:p.id, area:area.c, arch:p.arch, mean:x.r });
+      out.push({ id:p.id, area:area.c, arch:p.arch, mean:x.r, r:x.raw, ml:p.m, q:p.q });
     });
   }catch(e){}
   if(extra) out.push(extra);
@@ -369,7 +372,7 @@ function liveContradictions(area, item, sel, editing){
   if(!AXES.every(ax => sel[ax] != null)) return [];
   const m = meanR(sel);
   if(m == null) return [];
-  const all = answeredSoFar({ id:item.id, area:area.c, arch:item.arch, mean:m })
+  const all = answeredSoFar({ id:item.id, area:area.c, arch:item.arch, mean:m, r:sel, ml:item.m, q:item.q })
     .filter((x,i,arr) => arr.findIndex(y => y.id === x.id) === i || x.id === item.id);
   /* aynı soru hem geçmişten hem taslaktan gelebilir → son hâli kalsın */
   const dedup = {}; all.forEach(x => dedup[x.id] = x);
