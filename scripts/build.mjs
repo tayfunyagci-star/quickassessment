@@ -6,10 +6,12 @@
      npm ci
      QA_ADMIN_PASSWORD='…' npm run build
    Ortam değişkenleri:
-     QA_ADMIN_PASSWORD  panel parolası (zorunlu, en az 12 karakter). Panel
+     QA_ADMIN_PASSWORD  panel parolası (zorunlu, en az 8 karakter; gerçek
+                        kullanım için 12+ karakter önerilir). Panel
                         içeriği bu parolayla şifrelenir; parola çıktıda
                         hiçbir biçimde bulunmaz.
-     QA_BUILD_OUT       çıktı klasörü (varsayılan: _build)
+     QA_BUILD_OUT       çıktı klasörü (varsayılan: _build); komut satırında
+                        --out <klasör> ile de verilebilir (ör. --out . → repo kökü)
    ===================================================================== */
 import fs from "node:fs";
 import path from "node:path";
@@ -19,13 +21,15 @@ import crypto from "node:crypto";
 import zlib from "node:zlib";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const OUT = path.resolve(ROOT, process.env.QA_BUILD_OUT || "_build");
+const outArg = process.argv.indexOf("--out");
+const OUT = path.resolve(ROOT, (outArg > -1 && process.argv[outArg + 1]) || process.env.QA_BUILD_OUT || "_build");
 const PASSWORD = process.env.QA_ADMIN_PASSWORD || "";
-if(PASSWORD.length < 12){
-  console.error("HATA: QA_ADMIN_PASSWORD ortam değişkeni tanımlı değil ya da 12 karakterden kısa.\n" +
+if(PASSWORD.length < 8){
+  console.error("HATA: QA_ADMIN_PASSWORD ortam değişkeni tanımlı değil ya da 8 karakterden kısa.\n" +
                 "Örnek: QA_ADMIN_PASSWORD='uzun-ve-tahmin-edilemez-parola' npm run build");
   process.exit(1);
 }
+if(PASSWORD.length < 12) console.warn("UYARI: parola 12 karakterden kısa — yalnızca test derlemeleri için uygundur.");
 const KDF_ITER = 600000;
 const rd = rel => fs.readFileSync(path.join(ROOT, rel), "utf8");
 const nm = rel => path.join(ROOT, "node_modules", rel);

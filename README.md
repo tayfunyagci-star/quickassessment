@@ -24,17 +24,23 @@ QA_ADMIN_PASSWORD='uzun-ve-tahmin-edilemez-bir-parola' npm run build
 | `_build/Siber_Olgunluk_Analiz_Paneli.html` | Analiz Paneli (~1,3 MB). Danışmanlara bu dosya verilir. |
 | `_build/Kimlik_Dogrulayici.html` | İki adımlı doğrulama kodlarını üreten çevrimdışı uygulama. |
 
-- **`QA_ADMIN_PASSWORD` zorunludur** ve en az 12 karakter olmalıdır; aksi hâlde build hata verip durur.
+- **`QA_ADMIN_PASSWORD` zorunludur** ve en az 8 karakter olmalıdır; aksi hâlde build hata verip durur. Gerçek kullanım için 12+ karakterlik güçlü bir parola seçin (12'den kısa parolada build uyarı verir).
   - Parola dosyaya hiçbir biçimde (açık metin ya da özet olarak) yazılmaz.
   - Panelin tüm içeriği bu parolayla şifrelenir: PBKDF2-SHA256 600 000 tur → AES-256-GCM.
   - Parolayı repoya, commit mesajına veya CI günlüğüne yazmayın; CI'da secret olarak tanımlayın.
 - **Parolayı değiştirmek** için yeni parolayla yeniden build alıp yeni dosyayı dağıtın. Eski dosyada kurulmuş iki adımlı doğrulama yeni dosyaya taşınmaz, yeniden kurulmalıdır.
-- `QA_BUILD_OUT` ile çıktı klasörü değiştirilebilir.
+- `QA_BUILD_OUT` ortam değişkeni ya da `--out <klasör>` ile çıktı klasörü değiştirilebilir.
 - Build kendi denetimlerini de yapar:
   - Her gömülü betik sözdizimi denetiminden geçer.
   - Panelin şifresiz kabuğunda soru bankası veya iç mantık izi aranır.
   - Ankette ağ erişimi izi aranır.
   - Kimlik Doğrulayıcı'da da aynı ağ izi taraması yapılır.
+
+### Repo kökündeki test derlemesi
+
+Geliştirme sürecinde repo kökündeki `Siber_Olgunluk_Analiz_Paneli.html` ve `Kimlik_Dogrulayici.html` her değişiklikte
+**ekiple paylaşılan test parolasıyla** yeniden üretilir (`node scripts/build.mjs --out .`); denemek için build almaya gerek yoktur.
+Bu dosyalar yalnızca test içindir — danışmanlara veya müşteriye verilecek dosyayı kendi güçlü parolanızla `_build/` altına üretin.
 
 ## Sürüm kuralı
 
