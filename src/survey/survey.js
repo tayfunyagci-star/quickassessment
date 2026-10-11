@@ -21,15 +21,20 @@ const AXIS_HINT = {
   S:"Süreç tarafı — yazılı kural var mı, düzenli işletiliyor mu?",
   T:"Teknoloji tarafı — hangi araç/kontrol devrede?"
 };
-const CRIT_LABEL = {1:"Düşük", 2:"Orta", 3:"Yüksek", 4:"Kritik"};
 /* 0 = kapsam dışı: bu boyutun kurumda karşılığı yok. Skorlamaya girmez. */
 const NA_VALUE = 0;
 const NA_TEXT = "Bu boyutun kurumumuzda uygulama alanı bulunmamaktadır (kapsam dışı).";
-const ML_LABEL = {1:"Seviye 1 · Başlangıç", 2:"Seviye 2 · Tekrarlanabilir", 3:"Seviye 3 · Tanımlanmış",
-                  4:"Seviye 4 · Yönetilen", 5:"Seviye 5 · Optimize"};
 
-const FULL_AREAS = SURVEY.areas;              /* tam havuz — süzülmemiş */
+/* Anket verisi (v5) yalnızca katılımcının göreceği metinleri ve uyarlamalı akışın
+   ihtiyaç duyduğu sıra bilgisini taşır: her kapsam kombinasyonu için alan planı
+   (sorulacak soru aralığı + çalışma havuzu) panelde önceden hesaplanmıştır.
+   Puanlama ağırlıkları, mevzuat eşlemeleri ve bağımlılıklar ankette yoktur. */
 const SCOPES = SURVEY.scopes || [];
+const AREA_META = {};
+SURVEY.areas.forEach(a => AREA_META[a.c] = a);
+const FULL_AREAS = SURVEY.areas;              /* alan adları (bilgi şeridi için) */
+/* m = olgunluk basamağı (akışın yukarı/aşağı adımı), p = öncelik sırası */
+const ITEMS = SURVEY.items.map(x => ({ id:x.id, t:x.t, q:x.q, arch:x.arch, k:x.k, m:x.m, w:x.p }));
 
 /* Çalışma anında kapsam cevaplarına göre kurulan alan listesi */
 let AREAS = [];
@@ -39,7 +44,7 @@ function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, c=>({"&":"&amp;
 
 /* Arketip şablonuna sorunun konusunu gömer. */
 function ansText(arch, axis, level, konu){
-  const set = (SURVEY.ans[arch] || SURVEY.ans["politika"])[axis];
+  const set = (SURVEY.ans[arch] || SURVEY.ans[Object.keys(SURVEY.ans)[0]])[axis];
   return String(set[level-1]).replace(/\{k\}/g, konu || "");
 }
 
@@ -52,9 +57,19 @@ function defaultScopeAnswers(){
 
 /* Kapsam cevaplarına göre AREAS'ı yeniden kurar.
    Havuzu tamamen elenen alan otomatik olarak kapsam dışı sayılır. */
+function scopeMask(scopeAnswers){
+  return SCOPES.reduce((m, s, i) => {
+    const on = scopeAnswers[s[0]] === undefined ? !!s[2] : !!scopeAnswers[s[0]];
+    return on ? (m | (1 << i)) : m;
+  }, 0);
+}
 function rebuildAreas(scopeAnswers){
-  const ex = excludedTagsFrom(SCOPES, scopeAnswers);
-  AREAS = resolveAreas(FULL_AREAS, ex, SURVEY.meta.target);
+  const plan = SURVEY.plans[scopeMask(scopeAnswers)] || [];
+  AREAS = plan.map(pa => {
+    const meta = AREA_META[pa.c] || { c:pa.c, n:pa.c };
+    return { c:pa.c, n:meta.n, f:meta.f || null, r:meta.r || "", scopeOut: !!pa.s,
+             askMin:pa.a, askMax:pa.b, pool: pa.p.map(i => ITEMS[i]) };
+  });
   AREA_BY_CODE = {}; AREAS.forEach(a => AREA_BY_CODE[a.c] = a);
   return AREAS;
 }
@@ -189,7 +204,9 @@ function deriveStateFromHistory(history){
       } else {
         results[area.c] = { na:false, skipped:skipped, items: scored.map(x => {
           const it = area.pool[x.i];
-          const o = { id:it.id, q:it.q, t:it.t, arch:it.arch, k:it.k, w:it.w, ml:it.m, r:x.raw };
+          /* Yalnızca soru kimliği, katılımcının gördüğü metin ve cevap gönderilir;
+             puanlama değerlerini panel kendi kaydından okur. */
+          const o = { id:it.id, q:it.q, t:it.t, r:x.raw };
           if(x.ev) o.ev = x.ev;          /* katılımcının yazdığı kanıt */
           if(x.cf && x.cf.length) o.cf = x.cf;   /* tetiklenen çelişki kuralları */
           return o;
@@ -250,7 +267,7 @@ function renderScopeScreen(){
     const on = state.scope[s[0]];
     return '<div class="scope-q" data-id="' + esc(s[0]) + '">' +
       '<div class="scope-q-text">' + esc(s[1]) + '</div>' +
-      (s[4] ? '<div class="scope-q-note">' + esc(s[4]) + '</div>' : '') +
+      (s[3] ? '<div class="scope-q-note">' + esc(s[3]) + '</div>' : '') +
       '<div class="scope-q-btns">' +
       '<button type="button" class="scope-btn' + (on ? " on" : "") + '" data-v="1">Evet</button>' +
       '<button type="button" class="scope-btn' + (!on ? " on no" : "") + '" data-v="0">Hayır</button>' +
@@ -383,8 +400,6 @@ function questionSlideHTML(area, item, opts){
   if(idxInArea === 1 && area.r) h += '<p class="slide-rationale">' + esc(area.r) + '</p>';
   if(opts.reviewNote) h += '<div class="slide-review-note">' + opts.reviewNote + '</div>';
   h += '<div class="pill-row">' +
-       '<span class="axis-pill ml">' + esc(ML_LABEL[item.m]) + '</span>' +
-       '<span class="axis-pill crit-' + item.w + '">' + CRIT_LABEL[item.w] + '</span>' +
        '<span class="axis-pill">' + esc(SURVEY.arch[item.arch] || item.arch) + '</span></div>';
   h += '<div class="slide-question">' + esc(item.q) + '</div>';
   h += '<div class="slide-hint">Kontrol başlığı: ' + esc(item.t) +
@@ -618,13 +633,14 @@ function buildSubmission(){
   const d = deriveStateFromHistory(state.history);
   const results = Object.assign({}, scopeOutResults(), d.results);
   return {
-    type:"aoc_submission_v4",
+    type:"aoc_submission_v5",
+    appVersion: SURVEY.meta.appVersion,
     orgName: state.orgName,
     submittedAt: new Date().toISOString(),
     taxonomy: SURVEY.meta.tax,
     taxonomyName: SURVEY.meta.taxName,
-    bankVersion: SURVEY.meta.bankVersion,
     surveyId: SURVEY.meta.id,
+    qset: SURVEY.meta.qset,
     scope: state.scope,
     contact: state.contact || null,
     areaNames: AREAS.reduce((o,a) => (o[a.c] = a.n, o), {}),
@@ -645,7 +661,7 @@ function initLanding(){
   rebuildAreas(state.scope);
   document.getElementById("year").textContent = new Date().getFullYear();
   document.getElementById("taxPill").textContent = m.taxName;
-  document.getElementById("footMeta").textContent = m.taxName + " · " + m.bankVersion;
+  document.getElementById("footMeta").textContent = m.taxName + (m.appVersion ? " · v" + m.appVersion : "");
   const live = liveAreas();
   const lo = live.reduce((a,x) => a + x.askMin, 0), hi = live.reduce((a,x) => a + x.askMax, 0);
   document.getElementById("statAreas").textContent = live.length;

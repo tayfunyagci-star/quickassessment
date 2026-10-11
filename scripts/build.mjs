@@ -84,7 +84,6 @@ ${css}
 
 /* ---------- müşteri anketi şablonu ---------- */
 function buildSurveyTemplate(){
-  const engine = rd("src/shared/engine.js");
   const html = `${head("Hızlı Değerlendirme | Siber Güvenlik Olgunluk Anketi — Scale Bilgi Güvenliği ve Danışmanlık",
     `<meta name="description" content="Kurumunuzun siber güvenlik olgunluğunu ölçen, cevaplarınıza göre uyarlanan kısa bir öz-değerlendirme anketi.">\n`,
     rd("src/survey/theme.js"), rd("src/survey/survey.css"), FONTS_MARKER)}
@@ -92,7 +91,7 @@ function buildSurveyTemplate(){
 ${rd("src/survey/body.html")}
 <script>
 ${scriptSafe(rd("src/survey/survey.js"))}
-${scriptSafe(engine)}
+${scriptSafe(rd("src/shared/rules.js"))}
 ${scriptSafe(rd("src/survey/delivery.js"))}
 </script>
 <script>
@@ -115,7 +114,8 @@ function buildPayload(surveyTemplate){
     "/* VERİ — master soru bankası ve anket şablonu (build sırasında gömülür) */",
     `const BANK = ${jsonForScript(bank)};`,
     `const SURVEY_TEMPLATE = ${jsonForScript(surveyTemplate)};`,
-    rd("src/shared/engine.js"),
+    rd("src/panel/selection.js"),
+    rd("src/shared/rules.js"),
     rd("src/panel/panel.js"),
     rd("src/panel/security.js"),
   ].join("\n");

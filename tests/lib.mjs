@@ -108,3 +108,43 @@ export async function completeSurvey(page, { org = "Test Kurumu A.Ş.", answer =
   const password = (await page.textContent("#clientPasswordOut")).trim();
   return { file: dl.path, password, answered };
 }
+
+/* Anket cevap zarfı (PBKDF2-SHA256 150k → AES-256-GCM) — testlerde dosya incelemek/üretmek için. */
+const wc = globalThis.crypto.subtle;
+async function envKey(pw, salt){
+  const km = await wc.importKey("raw", new TextEncoder().encode(pw), "PBKDF2", false, ["deriveKey"]);
+  return wc.deriveKey({ name:"PBKDF2", salt, iterations:150000, hash:"SHA-256" }, km, { name:"AES-GCM", length:256 }, false, ["encrypt","decrypt"]);
+}
+export async function openEnvelope(file, pw){
+  const env = JSON.parse(fs.readFileSync(file, "utf8"));
+  const pt = await wc.decrypt({ name:"AES-GCM", iv: Buffer.from(env.iv, "base64") }, await envKey(pw, Buffer.from(env.salt, "base64")), Buffer.from(env.ciphertext, "base64"));
+  return JSON.parse(Buffer.from(pt).toString("utf8"));
+}
+export async function sealEnvelope(obj, pw, file){
+  const salt = globalThis.crypto.getRandomValues(new Uint8Array(16)), iv = globalThis.crypto.getRandomValues(new Uint8Array(12));
+  const ct = await wc.encrypt({ name:"AES-GCM", iv }, await envKey(pw, salt), new TextEncoder().encode(JSON.stringify(obj)));
+  const env = { type:"quickassess_encrypted_submission", alg:"AES-256-GCM/PBKDF2-SHA256",
+                salt: Buffer.from(salt).toString("base64"), iv: Buffer.from(iv).toString("base64"), ciphertext: Buffer.from(ct).toString("base64") };
+  fs.writeFileSync(file, JSON.stringify(env));
+  return file;
+}
+
+/* Panelde Değerlendirme Merkezi'nden bir cevap dosyasını çözer ve analizin oluşmasını bekler. */
+export async function decryptInPanel(page, file, password){
+  await page.evaluate(() => switchTab("hub"));
+  await page.setInputFiles("#fileInput", file);
+  await page.fill("#pwInput", password);
+  const before = await page.evaluate(() => window.loadCount);
+  await page.click("#btnDecrypt");
+  await page.waitForFunction(prev => window.loadCount > prev, before, { timeout: 15000 });
+}
+
+/* Panelde anket üretir; dosya yolunu döndürür. */
+export async function generateSurvey(page, { tax = "uct", target = null, name = "anket.html" } = {}){
+  await page.evaluate(() => switchTab("gen"));
+  await page.click('#genNav .gen-step[data-step="1"]');
+  await page.click(`#taxChoices .choice[data-tax="${tax}"]`);
+  await page.click('#genNav .gen-step[data-step="3"]');
+  if(target) await page.evaluate(v => { const r = document.getElementById("targetRange"); r.value = v; r.dispatchEvent(new Event("input")); }, target);
+  return (await download(page, () => page.click("#btnGenerate"), name)).path;
+}

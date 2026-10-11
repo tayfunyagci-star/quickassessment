@@ -606,26 +606,66 @@ document.getElementById("btnGenPreview").addEventListener("click", () => {
   document.getElementById("genMsg").innerHTML = html;
 });
 
-/* Her iki üretim yolu da aynı anket verisini kullanır; tek kaynak budur. */
 const SURVEY_MARKER = "/*__SURVEY__*/null/*__/SURVEY__*/";
 
-function anketVerisi(full){
+/* ---- Üretilen anketlerin kaydı ----
+   Her anketin taşıdığı soruların o anki bankadaki tam kaydı (kritiklik, olgunluk,
+   arketip, mevzuat) bu tarayıcıda saklanır. Cevap dosyası geldiğinde puanlama bu
+   kayıttan yapılır; banka sonradan değişse de anket üretildiği hâliyle değerlendirilir. */
+const LS_ISSUED = "aoc_issued_v1";
+function issuedRegistry(){ try{ return JSON.parse(localStorage.getItem(LS_ISSUED) || "{}") || {}; }catch(e){ return {}; } }
+function saveIssued(reg){
+  const ids = Object.keys(reg).sort((a,b) => String(reg[a].at).localeCompare(String(reg[b].at)));
+  for(;;){
+    try{ localStorage.setItem(LS_ISSUED, JSON.stringify(reg)); return true; }
+    catch(e){ if(!ids.length) return false; delete reg[ids.shift()]; }   /* yer açmak için en eski kayıt silinir */
+  }
+}
+async function sha256Hex(text){
+  const d = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(d)).map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+/* Her kapsam kombinasyonu (2^n) için alan planı: kapsam dışı mı, kaç kontrol sorusu
+   sorulur, çalışma havuzu hangi sırayla. Kota ve ağırlık hesabı burada kalır;
+   ankete yalnızca sonuç (plan) ve planlarda geçen soruların metni gider. */
+function scopePlans(full, target){
+  const scopes = BANK.scopes, items = [], idx = {}, plans = {};
+  const add = p => {
+    if(idx[p.id] === undefined){ idx[p.id] = items.length; items.push({ id:p.id, t:p.t, q:p.q, arch:p.arch, k:p.k, m:p.m, p:p.w }); }
+    return idx[p.id];
+  };
+  for(let mask = 0; mask < (1 << scopes.length); mask++){
+    const answers = {};
+    scopes.forEach((s, i) => { answers[s[0]] = !!(mask & (1 << i)); });
+    plans[mask] = resolveAreas(full, excludedTagsFrom(scopes, answers), target)
+      .map(a => ({ c:a.c, s:a.scopeOut ? 1 : 0, a:a.askMin, b:a.askMax, p:a.pool.map(add) }));
+  }
+  return { items, plans };
+}
+
+async function anketVerisi(full){
   const org = document.getElementById("genOrgName").value.trim();
-  const note = document.getElementById("genNote").value.trim();
+  const contact = document.getElementById("genContact").value.trim();
   const target = currentTarget();
+  const { items, plans } = scopePlans(full, target);
+  const used = Array.from(new Set(items.map(x => x.arch)));
+  const pick = obj => used.reduce((o, k) => { if(obj[k]) o[k] = obj[k]; return o; }, {});
+  const qset = await sha256Hex(JSON.stringify({ tax:genTax, items, plans }));
   return {
+    v: 5,
     meta: {
-      id: "s" + Date.now().toString(36),
+      id: "s" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
       tax: genTax,
       taxName: genTax === "nist" ? "NIST CSF 2.0" : "UCT Kontrol Taksonomisi",
-      bankVersion: BANK.v,
+      appVersion: APP_VERSION,
       generatedAt: new Date().toISOString(),
-      orgName: org, note: note, target: target
+      orgName: org, target: target, contactEmail: contact || "webrequest@scaleteknoloji.com", qset: qset
     },
-    scopes: BANK.scopes,
-    arch: BANK.arch,
-    ans: BANK.ans,
-    areas: full
+    scopes: BANK.scopes.map(s => [s[0], s[1], s[2], s[4] || ""]),
+    areas: full.map(a => ({ c:a.c, n:a.n, f:a.f, r:a.r })),
+    items: items, plans: plans,
+    arch: pick(BANK.arch), ans: pick(BANK.ans)
   };
 }
 
@@ -635,26 +675,34 @@ function anketKapsami(full){
   return { lo: resolved.reduce((a,x) => a + x.askMin, 0), hi: resolved.reduce((a,x) => a + x.askMax, 0) };
 }
 
-document.getElementById("btnGenerate").addEventListener("click", () => {
+document.getElementById("btnGenerate").addEventListener("click", async () => {
   const full = lastFullAreas || buildFullAreas(genTax);
-  if(!full.length){ document.getElementById("genMsg").innerHTML = '<div class="note warn">Bu çerçevede hiç soru bulunamadı.</div>'; return; }
+  const msg = document.getElementById("genMsg");
+  if(!full.length){ msg.innerHTML = '<div class="note warn">Bu çerçevede hiç soru bulunamadı.</div>'; return; }
+  if(SURVEY_TEMPLATE.indexOf(SURVEY_MARKER) === -1){ msg.innerHTML = '<div class="note warn">Şablon işaretçisi bulunamadı.</div>'; return; }
   const org = document.getElementById("genOrgName").value.trim();
   const note = document.getElementById("genNote").value.trim();
-  const data = anketVerisi(full);
-  const marker = SURVEY_MARKER;
+  const data = await anketVerisi(full);
   /* '<' kaçışlanır: soru metinleri betiği erken kapatamaz. */
   const json = JSON.stringify(data).replace(/</g, "\\u003c");
-  if(SURVEY_TEMPLATE.indexOf(marker) === -1){ document.getElementById("genMsg").innerHTML = '<div class="note warn">Şablon işaretçisi bulunamadı.</div>'; return; }
-  const html = SURVEY_TEMPLATE.replace(marker, () => json).replace("/*@FONTS@*/", () => gomuluFontlar());
+  const html = SURVEY_TEMPLATE.replace(SURVEY_MARKER, () => json).replace("/*@FONTS@*/", () => gomuluFontlar());
+
+  const reg = issuedRegistry();
+  reg[data.meta.id] = { at: data.meta.generatedAt, org: org, note: note, tax: genTax, qset: data.meta.qset,
+                        bankVersion: BANK.v, appVersion: APP_VERSION,
+                        rows: data.items.reduce((o, x) => { o[x.id] = Q_BY_ID[x.id]; return o; }, {}) };
+  const kayitli = saveIssued(reg);
+
   const k = anketKapsami(full);
   const lo = k.lo, hi = k.hi;
   const fname = "hizli-degerlendirme_" + genTax + (org ? "_" + slug(org) : "") + (note ? "_" + slug(note) : "") + ".html";
   download(fname, html, "text/html;charset=utf-8");
-  document.getElementById("genMsg").innerHTML =
-    '<div class="note"><b>' + esc(fname) + '</b> indirildi. ' + full.length + ' kontrol alanı, ankete gömülen havuz ' +
-    full.reduce((a,x) => a + x.pool.length, 0) + ' madde; katılımcıya en geniş kapsamda ' + lo + '–' + hi +
+  msg.innerHTML =
+    '<div class="note"><b>' + esc(fname) + '</b> indirildi. ' + full.length + ' kontrol alanı; ankete yalnızca kapsam planlarında geçen ' +
+    data.items.length + ' kontrol sorusunun metni gömüldü (bankada ' + BANK.Q.length + '). Katılımcıya en geniş kapsamda ' + lo + '–' + hi +
     ' kontrol sorusu (' + (lo*3) + '–' + (hi*3) + ' İ/S/T cevabı) sorulacak. ' +
-    'Kapsam soruları anketin ilk sayfasında yer alır. Dosya tek başına ve internetsiz çalışır (ağ erişimi kapalı); cevaplar cihazdan kendiliğinden çıkmaz.</div>';
+    'Kapsam soruları anketin ilk sayfasında yer alır. Dosya tek başına ve internetsiz çalışır (ağ erişimi kapalı); cevaplar cihazdan kendiliğinden çıkmaz.</div>' +
+    (kayitli ? '' : '<div class="note warn">Anket kaydı tarayıcıya yazılamadı; cevaplar güncel soru bankasıyla puanlanacak.</div>');
 });
 
 /* =====================================================================
@@ -1348,8 +1396,60 @@ document.getElementById("btnDecrypt").addEventListener("click", async () => {
 });
 document.getElementById("btnNewLoad").addEventListener("click", () => { switchTab("hub"); });
 
+/* ---- Cevap dosyası bütünlüğü ----
+   Puanlamada kullanılan kritiklik, olgunluk basamağı, arketip ve konu cevap
+   dosyasından ALINMAZ (dosya katılımcı tarafında üretilir). Kaynak önceliği:
+   1) anketin bu tarayıcıdaki üretim kaydı (parmak izi eşleşirse),
+   2) güncel soru bankası (soru kimliğiyle).
+   Eski (v4) dosyalarda dosyadaki değerler yalnızca bankada bulunmayan
+   sorular için ve uyarıyla kullanılır. */
+function resolveSubmission(sub){
+  const reg = sub.surveyId ? issuedRegistry()[sub.surveyId] : null;
+  const legacy = sub.type !== "aoc_submission_v5";
+  const useIssued = !!(reg && (!sub.qset || reg.qset === sub.qset));
+  const info = { source: useIssued ? "issued" : "bank", legacy: legacy, issuedAt: reg ? reg.at : null,
+                 qsetMismatch: !!(reg && sub.qset && reg.qset !== sub.qset),
+                 dropped: [], fromFile: [], textDiff: [], valueDiff: [] };
+  Object.keys(sub.results || {}).forEach(code => {
+    const r = sub.results[code];
+    if(!r || !Array.isArray(r.items)) return;
+    r.items = r.items.filter(it => {
+      const row = (useIssued && reg.rows && reg.rows[it.id]) || Q_BY_ID[it.id];
+      if(!row){
+        if(legacy && it.w != null && it.ml != null){ info.fromFile.push(it.id); return true; }
+        info.dropped.push(it.id); return false;
+      }
+      if(legacy && ((it.w != null && it.w !== row[F.w]) || (it.ml != null && it.ml !== row[F.m]))) info.valueDiff.push(it.id);
+      if(it.q && it.q !== row[F.q]) info.textDiff.push(it.id);
+      it.w = row[F.w]; it.ml = row[F.m]; it.arch = row[F.arch]; it.k = row[F.k];
+      if(!it.t) it.t = row[F.t];
+      if(!it.q) it.q = row[F.q];
+      return true;
+    });
+  });
+  sub.bankVersion = sub.bankVersion || (reg && reg.bankVersion) || BANK.v;
+  sub.__qset = info;
+  return sub;
+}
+function qsetNoteHTML(sub){
+  const q = sub.__qset; if(!q) return "";
+  const src = q.source === "issued"
+    ? "Soru seti, anketin bu tarayıcıdaki üretim kaydıyla eşleşti (" + esc(new Date(q.issuedAt).toLocaleString("tr-TR")) + "); puanlama o kayıttan yapıldı."
+    : "Anketin üretim kaydı bu tarayıcıda bulunamadı" + (q.qsetMismatch ? " ya da parmak izi eşleşmedi" : "") + "; puanlama güncel soru bankasından yapıldı.";
+  const warn = [];
+  if(q.legacy) warn.push("Dosya eski anket sürümüyle (v4) üretilmiş.");
+  if(q.valueDiff.length) warn.push(q.valueDiff.length + " soruda dosyadaki kritiklik/olgunluk bilgisi bankadan farklıydı; banka değerleri kullanıldı.");
+  if(q.textDiff.length) warn.push(q.textDiff.length + " sorunun metni bankada değişmiş; cevaplar katılımcının gördüğü metinle gösterilir.");
+  if(q.fromFile.length) warn.push(q.fromFile.length + " soru bankada bulunamadı; dosyadaki değerlerle puanlandı: " + esc(q.fromFile.join(", ")) + ".");
+  if(q.dropped.length) warn.push(q.dropped.length + " soru bankada bulunamadığı için analize alınmadı: " + esc(q.dropped.join(", ")) + ".");
+  return '<div class="note' + (warn.length ? " warn" : "") + '" style="margin-bottom:20px"><b>Soru seti.</b> ' + src +
+         (warn.length ? " " + warn.join(" ") : "") + '</div>';
+}
+
+let loadCount = 0;
 function loadSubmission(sub){
-  currentSub = sub;
+  resolveSubmission(sub);
+  currentSub = sub; loadCount++;
   if(!sub.__decisions) sub.__decisions = loadDecisions(sub);
   currentState = computeResults(sub);
   document.getElementById("tabBtnResults").disabled = false;
@@ -1374,6 +1474,7 @@ function renderResults(){
   const scored = st.rows.filter(r => !r.na);
   let h = "";
 
+  h += qsetNoteHTML(sub);
   if(sub.demo) h += '<div class="note warn" style="margin-bottom:20px"><b>Demo verisi</b> — bu ekran örnek yanıtlarla üretilmiştir, gerçek bir değerlendirme değildir.</div>';
 
   /* Kanıt incelemesi uyarısı — raporu okuyan herkes görmeli. */
@@ -1941,6 +2042,7 @@ document.getElementById("fltText").addEventListener("input", renderBank);
 Object.assign(window, { BANK, F, AXES, AXIS_NAME, AXIS_FULL, CRIT_LABEL, REG_DEFS, NA_VALUE, NA_REASON });
 Object.defineProperty(window, "currentState", { get: () => currentState, configurable: true });
 Object.defineProperty(window, "currentSub",   { get: () => currentSub,   configurable: true });
+Object.defineProperty(window, "loadCount",    { get: () => loadCount,    configurable: true });
 Object.defineProperty(window, "genTax",       { get: () => genTax,       configurable: true });
 
 /* =====================================================================
