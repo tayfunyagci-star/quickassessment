@@ -230,8 +230,20 @@
   <!-- ============ SORU BANKASI ============ -->
   <div id="tabBank" class="hidden">
     <div class="panel-card">
-      <h2>Master soru bankası</h2>
+      <h2>Soru bankası</h2>
       <p class="sub" id="bankSub">—</p>
+      <div class="bank-state" id="bankState"></div>
+      <div class="bank-toolbar">
+        <button class="btn btn-primary" id="btnQNew" type="button">Yeni Soru</button>
+        <button class="btn btn-ghost" id="btnBankXlsxOut" type="button">Excel'e Aktar</button>
+        <button class="btn btn-ghost" id="btnBankXlsxIn" type="button">Excel'den Yükle</button>
+        <button class="btn btn-ghost" id="btnBankJsonOut" type="button">Yedek İndir (JSON)</button>
+        <button class="btn btn-ghost" id="btnBankJsonIn" type="button">Yedekten Yükle</button>
+        <button class="btn btn-ghost danger" id="btnBankReset" type="button">Varsayılana Dön</button>
+        <input type="file" id="bankXlsxFile" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" class="hidden">
+        <input type="file" id="bankJsonFile" accept=".json,application/json" class="hidden">
+      </div>
+      <div id="bankMsg"></div>
       <div class="bank-filters">
         <select id="fltArea"></select>
         <select id="fltArch"><option value="">Tüm kontrol arketipleri</option></select>
@@ -241,6 +253,25 @@
       </div>
       <div id="bankCount" style="font-size:.82rem;color:var(--slate-2);margin-bottom:10px"></div>
       <div id="bankList"></div>
+    </div>
+    <div class="panel-card">
+      <h2>Kapsam soruları</h2>
+      <p class="sub">Ankette ilk sayfada sorulur; «Hayır» yanıtı ilgili kapsam etiketindeki soruları ankete hiç getirmez. Metin ve varsayılan cevap düzenlenebilir.</p>
+      <div id="scopeEdit"></div>
+    </div>
+  </div>
+
+  <!-- ============ SORU DÜZENLEME ============ -->
+  <div id="qEditor" class="q-editor hidden" role="dialog" aria-modal="true" aria-labelledby="qEdTitle">
+    <div class="q-editor-box">
+      <h2 id="qEdTitle">Soru</h2>
+      <div id="qEdBody"></div>
+      <div class="gate-err" id="qEdErr"></div>
+      <div class="q-editor-actions">
+        <button class="btn btn-primary" id="btnQSave" type="button">Kaydet</button>
+        <button class="btn btn-ghost" id="btnQCancel" type="button">Vazgeç</button>
+        <button class="btn btn-ghost danger" id="btnQDelete" type="button">Soruyu Sil</button>
+      </div>
     </div>
   </div>
   <!-- ============ GÜVENLİK ============ -->

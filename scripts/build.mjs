@@ -112,11 +112,13 @@ function buildPayload(surveyTemplate){
   const script = [
     "\"use strict\";",
     "/* VERİ — master soru bankası ve anket şablonu (build sırasında gömülür) */",
-    `const BANK = ${jsonForScript(bank)};`,
+    `const BANK_DEFAULT = ${jsonForScript(bank)};`,
     `const SURVEY_TEMPLATE = ${jsonForScript(surveyTemplate)};`,
+    rd("src/panel/bankstore.js"),
     rd("src/panel/selection.js"),
     rd("src/shared/rules.js"),
     rd("src/panel/panel.js"),
+    rd("src/panel/bankedit.js"),
     rd("src/panel/security.js"),
   ].join("\n");
   return { body: rd("src/panel/body.html"), script };
@@ -213,7 +215,7 @@ const panel = buildPanel(encryptPayload(payload));
 syntaxCheck("panel", panel);
 forbid("panel", panel, NETWORK_TOKENS);
 /* Dış kabukta (şifresiz kısım) panelin iç bilgisi ve parola bulunmamalı. */
-forbid("panel kabuğu", panel, [PASSWORD, "computeResults", "CONTRA_RULES", "SURVEY_TEMPLATE", "UCT.01.001", "REG_DEFS", "ladderLock"]);
+forbid("panel kabuğu", panel, [PASSWORD, "computeResults", "CONTRA_RULES", "SURVEY_TEMPLATE", "BANK_DEFAULT", "UCT.01.001", "REG_DEFS", "ladderLock"]);
 
 const auth = buildAuth();
 syntaxCheck("kimlik doğrulayıcı", auth);

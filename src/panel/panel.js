@@ -132,7 +132,11 @@ function download(name, content, mime){
 
 /* Banka indeksleri */
 const Q_BY_ID = {};
-BANK.Q.forEach(q => Q_BY_ID[q[F.id]] = q);
+function rebuildBankIndex(){
+  Object.keys(Q_BY_ID).forEach(k => { delete Q_BY_ID[k]; });
+  BANK.Q.forEach(q => Q_BY_ID[q[F.id]] = q);
+}
+rebuildBankIndex();
 function regOf(id){ const q = Q_BY_ID[id]; return (q && q[F.reg]) || []; }
 function hasReg(id, key){ return regOf(id).some(r => r.indexOf(key + ":") === 0); }
 function regDetail(id, key){
@@ -141,7 +145,7 @@ function regDetail(id, key){
 }
 /* Arketip şablonuna konuyu gömerek cevap metnini üretir. */
 function ansText(arch, axis, level, konu){
-  const set = (BANK.ans[arch] || BANK.ans["politika"])[axis];
+  const set = (BANK.ans[arch] || BANK.ans["politika"] || BANK.ans[Object.keys(BANK.ans)[0]])[axis];
   return String(set[level-1]).replace(/\{k\}/g, konu || "");
 }
 
@@ -2022,6 +2026,7 @@ function renderBank(){
     '<span class="tag-chip">Olgunluk ' + q[F.m] + '</span>' +
     '<span class="tag-chip">' + CRIT_LABEL[q[F.w]] + '</span>' +
     (q[F.reg] || []).map(r => '<span class="tag-chip">' + esc(r) + '</span>').join("") +
+    '<button type="button" class="btn btn-ghost q-edit-btn" data-qedit="' + esc(q[F.id]) + '">Düzenle</button>' +
     '</div><div style="font-size:.78rem;color:var(--slate-2);margin-top:.3em">' + esc(q[F.t]) + '</div>' +
     '<details class="drill" style="margin-top:8px"><summary style="padding:8px 12px;font-family:var(--font-display);font-weight:600;font-size:.78rem;color:var(--navy)">' +
     '<span class="chev">▶</span> İnsan / Süreç / Teknoloji cevap setini göster</summary><div class="drill-body">' +

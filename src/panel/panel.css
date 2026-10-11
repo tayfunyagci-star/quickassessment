@@ -755,3 +755,25 @@ html[data-tema="koyu"] h1, html[data-tema="koyu"] h2, html[data-tema="koyu"] h3,
   .brand-actions .tema-btn span{ display:none; }
   .brand-actions .tema-btn{ padding:.5em .6em; }
 }
+
+/* ---- Soru Yönetimi ---- */
+.bank-state{ font-size:.85rem; color:var(--slate); margin:-.4em 0 14px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.tag-chip.edited{ color:var(--gold); border-color:var(--gold); }
+.bank-toolbar{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
+.bank-toolbar .btn{ padding:.7em 1.2em; font-size:.82rem; }
+.q-edit-btn{ padding:.35em .9em !important; font-size:.72rem !important; margin-left:auto; }
+.bank-item .bm{ align-items:center; }
+.q-editor{ position:fixed; inset:0; z-index:200; background:rgba(8,14,22,.62); display:flex; align-items:flex-start; justify-content:center; overflow:auto; padding:40px 16px; }
+.q-editor-box{ width:100%; max-width:920px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius-lg); padding:26px 28px; box-shadow:var(--shadow-lg); }
+.q-editor-box h2{ font-size:1.15rem; }
+.q-grid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:4px 20px; }
+.q-grid .field.wide{ grid-column:1 / -1; }
+@media (max-width:760px){ .q-grid{ grid-template-columns:1fr; } }
+.q-grid textarea{ resize:vertical; }
+.q-hint{ font-size:.78rem; color:var(--slate-2); }
+.q-editor-actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
+.q-editor-actions .danger{ margin-left:auto; }
+.scope-edit-row{ display:grid; grid-template-columns:minmax(0,3fr) minmax(0,1fr); gap:4px 16px; padding:14px 0; border-bottom:1px solid var(--line); }
+.scope-edit-row .field.wide{ grid-column:1 / -1; }
+.scope-edit-row .field{ margin-bottom:6px; }
+#scopeEdit .btn{ margin-top:16px; }
