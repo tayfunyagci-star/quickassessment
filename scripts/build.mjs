@@ -118,6 +118,10 @@ function buildPayload(surveyTemplate){
     rd("src/panel/selection.js"),
     rd("src/shared/rules.js"),
     rd("src/panel/panel.js"),
+    `const REPORT_TEMPLATE_B64 = ${JSON.stringify(b64(path.join(ROOT, "assets", "Rapor_Sablonu_Scale.dotx")))};`,
+    rd("src/panel/reportmodel.js"),
+    rd("src/panel/report_word.js"),
+    rd("src/panel/report_html.js"),
     rd("src/panel/bankedit.js"),
     rd("src/panel/security.js"),
   ].join("\n");

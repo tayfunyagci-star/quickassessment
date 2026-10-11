@@ -150,15 +150,20 @@
   <!-- ============ ANALİZ ============ -->
   <div id="tabResults" class="hidden">
     <div class="result-actions">
-      <button class="btn btn-primary" id="btnBrosur">
+      <button class="btn btn-primary" id="btnWord" type="button">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px"><path d="M7 3h7l5 5v13a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M14 3v5h5"/><path d="M9 17h6M9 13h6"/></svg>
-        Broşür Raporu (PDF)
+        Word Raporu
+      </button>
+      <button class="btn btn-primary" id="btnHtml" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>
+        HTML İnfografik Rapor
       </button>
       <button class="btn" id="btnPrint">Ham ekran çıktısı</button>
       <button class="btn" id="btnJson">JSON Raporu İndir</button>
       <button class="btn" id="btnCsv">CSV İndir</button>
       <button class="btn btn-ghost" id="btnNewLoad">Yeni Dosya Aç</button>
     </div>
+    <div id="reportMsg"></div>
     <div id="resultsWrap"></div>
   </div>
 
