@@ -1,0 +1,310 @@
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <span>Scale Teknoloji ve Danışmanlık &middot; Uyum &middot; Denetim &middot; Teknik Güvence</span>
+    <span class="accent">Danışman aracı &middot; Veriler yalnızca bu tarayıcıda işlenir</span>
+  </div>
+</div>
+
+<div class="brandbar">
+  <div class="brandbar-inner">
+    <div class="brandmark">
+      <span class="bm-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg></span>
+      <span>Analiz Paneli<small>Siber Güvenlik Olgunluk Değerlendirmesi</small></span>
+    </div>
+    <div class="brand-actions">
+      <span class="bank-pill" id="bankPill">—</span>
+      <button type="button" class="tema-btn" id="btnHome" title="Değerlendirme Merkezi">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+        <span>Merkez</span>
+      </button>
+      <button type="button" class="tema-btn" id="btnSecurity" title="İki adımlı doğrulama ve oturum">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/></svg>
+        <span>Güvenlik</span>
+      </button>
+      <button type="button" class="tema-btn" id="btnTema" title="Açık / koyu tema" aria-pressed="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg>
+        <span id="temaLbl">Koyu</span>
+      </button>
+      <button type="button" class="tema-btn" id="btnLogout" title="Oturumu kapat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+        <span>Çıkış</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="app">
+  <div class="tabs hidden" id="tabsBar">
+    <button class="tab-btn tab-home" data-tab="hub">&larr; Değerlendirme Merkezi</button>
+    <button class="tab-btn" data-tab="gen" data-sec="gen">Anket Üret</button>
+    <button class="tab-btn" data-tab="review" data-sec="analiz" id="tabBtnReview" disabled>Kanıt İncelemesi</button>
+    <button class="tab-btn" data-tab="results" data-sec="analiz" id="tabBtnResults" disabled>Analiz &amp; Skorlama</button>
+    <button class="tab-btn" data-tab="answers" data-sec="analiz" id="tabBtnAnswers" disabled>Verilen Cevaplar</button>
+    <button class="tab-btn" data-tab="bank" data-sec="soru">Soru Bankası</button>
+    <button class="tab-btn" data-tab="method" data-sec="soru">Metodoloji &amp; Ağırlıklar</button>
+  </div>
+
+  <!-- ============ DEĞERLENDİRME MERKEZİ ============ -->
+  <div id="tabHub">
+    <div class="app-head">
+      <p class="ref">Değerlendirme Merkezi</p>
+      <h1 style="font-size:1.7rem">Ne yapmak istiyorsunuz?</h1>
+      <p class="lede" style="font-size:.95rem">Kurumdan gelen şifreli cevap dosyasını aşağıdaki alana bırakıp şifresini girin; analiz doğrudan açılır.
+        Yeni bir anket üretmek veya soru bankasını düzenlemek için sağdaki kartları kullanın.</p>
+    </div>
+    <div class="hub-grid">
+      <section class="panel-card hub-main" aria-labelledby="hubAnalizTtl">
+        <p class="ref">Anket Analizi</p>
+        <h2 id="hubAnalizTtl">Şifreli cevap dosyasını açın</h2>
+        <p class="sub">Anketin ürettiği <span class="mono">.json</span> dosyası ve kurumun ayrı kanaldan ilettiği 8 haneli şifre gereklidir.
+          Çözme işlemi tamamen bu tarayıcıda yapılır; hiçbir veri gönderilmez.</p>
+        <div class="upload-box" id="uploadBox">
+          <svg class="up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+          <p style="margin:0 0 4px">Dosyayı buraya sürükleyip bırakın</p>
+          <input type="file" id="fileInput" accept="application/json,.json" class="hidden">
+          <button class="btn btn-ghost" id="btnChooseFile" type="button" style="margin-top:10px">Dosya Seç</button>
+          <div class="upload-filename" id="uploadFilename"></div>
+          <input type="text" id="pwInput" class="pw-input" placeholder="8 haneli şifre" maxlength="12" inputmode="numeric" autocomplete="off">
+          <div class="gate-err" id="decryptErr"></div>
+          <button class="btn btn-primary" id="btnDecrypt" style="margin-top:6px">Çöz ve Analize Geç</button>
+        </div>
+      </section>
+      <div class="hub-side">
+        <button type="button" class="hub-card" data-goto="gen">
+          <span class="hub-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></span>
+          <span class="hub-txt"><b>Anket Üretimi</b><small>Çerçeve ve uzunluk seçip kuruma özel, tek dosyalık çevrimdışı anket üretin.</small></span>
+        </button>
+        <button type="button" class="hub-card" data-goto="bank">
+          <span class="hub-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg></span>
+          <span class="hub-txt"><b>Soru Yönetimi</b><small>Soru bankası, kapsam soruları, bağımlılıklar, ağırlıklar ve olgunluk eşiği.</small></span>
+        </button>
+        <button type="button" class="hub-card hidden" id="hubLast" data-goto="results">
+          <span class="hub-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg></span>
+          <span class="hub-txt"><b>Açık analize dön</b><small id="hubLastSub">—</small></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ ANKET ÜRET ============ -->
+  <div id="tabGen" class="hidden">
+  <div class="gen-layout">
+    <nav class="gen-nav" id="genNav" aria-label="Anket üretim adımları">
+      <button type="button" class="gen-step active" data-step="1"><b>1</b><span>Taksonomi ve çerçeve</span></button>
+      <button type="button" class="gen-step" data-step="2"><b>2</b><span>Kapsam</span></button>
+      <button type="button" class="gen-step" data-step="3"><b>3</b><span>Uzunluk, kurum ve üretim</span></button>
+    </nav>
+    <div class="gen-body">
+
+    <div class="panel-card gen-panel" data-step="1">
+      <h2>1 · Taksonomi ve çerçeve</h2>
+      <p class="sub">Sorular ve raporlama, seçtiğiniz kontrol çerçevesinin alanlarına göre üretilir.</p>
+      <div class="choice-grid" id="taxChoices"></div>
+    </div>
+
+    <div class="panel-card gen-panel" data-step="2">
+      <h2>2 · Kapsam</h2>
+      <p class="sub">Kapsam soruları artık ankette katılımcıya sorulur; havuz eksiksiz gönderilir ve filtreleme
+        anket açıldığında yapılır. Aşağıdaki liste yalnızca hangi kapsam sorusunun hangi maddeleri elediğini gösterir.</p>
+      <div class="scope-list" id="scopeList"></div>
+    </div>
+
+    <div class="panel-card gen-panel" data-step="3">
+      <h2>3 · Uzunluk ve kurum</h2>
+      <div class="field-row">
+        <div class="field">
+          <label for="targetRange">Hedef kontrol sorusu sayısı</label>
+          <input type="range" id="targetRange" min="12" max="30" step="1" value="20">
+          <span class="range-val" id="targetVal">20</span>
+          <span class="range-sub" id="targetSub">= 60 İ/S/T cevabı</span>
+          <span style="font-size:.82rem;color:var(--slate-2)">Her kontrol sorusu İnsan, Süreç ve Teknoloji boyutları için ayrı ayrı yanıtlanır.
+            Anket uyarlanabilir olduğu için gerçek kontrol sorusu sayısı cevaplara göre bu değerin altında kalabilir.</span>
+        </div>
+        <div class="field">
+          <label for="genOrgName">Kurum adı (opsiyonel)</label>
+          <input type="text" id="genOrgName" placeholder="Ankette ön-doldurulur">
+          <label for="genNote" style="margin-top:14px">Dosya etiketi (opsiyonel)</label>
+          <input type="text" id="genNote" placeholder="örn. 2026-Q3">
+          <span style="font-size:.82rem;color:var(--slate-2)">Yalnızca dosya adında ve bu tarayıcıdaki anket kaydında kullanılır; ankete yazılmaz.</span>
+          <label for="genContact" style="margin-top:14px">Cevap dosyasının gönderileceği e-posta</label>
+          <input type="email" id="genContact" value="webrequest@scaleteknoloji.com">
+        </div>
+      </div>
+      <hr class="hr">
+      <div class="preview-grid" id="previewGrid"></div>
+      <div id="previewDetail" style="margin-top:18px"></div>
+      <div style="margin-top:22px;display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-primary" id="btnGenerate">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+          Anketi Üret ve İndir
+        </button>
+        <button class="btn btn-ghost" id="btnGenPreview">Havuzu Önizle</button>
+      </div>
+      <div id="genMsg" style="margin-top:16px"></div>
+    </div>
+    </div>
+  </div>
+</div>
+
+  <!-- ============ ANALİZ ============ -->
+  <div id="tabResults" class="hidden">
+    <div class="result-actions">
+      <button class="btn btn-primary" id="btnWord" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px"><path d="M7 3h7l5 5v13a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M14 3v5h5"/><path d="M9 17h6M9 13h6"/></svg>
+        Word Raporu
+      </button>
+      <button class="btn btn-primary" id="btnHtml" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>
+        HTML İnfografik Rapor
+      </button>
+      <button class="btn" id="btnPrint">Ham ekran çıktısı</button>
+      <button class="btn" id="btnJson">JSON Raporu İndir</button>
+      <button class="btn" id="btnCsv">CSV İndir</button>
+      <button class="btn btn-ghost" id="btnNewLoad">Yeni Dosya Aç</button>
+    </div>
+    <div id="reportMsg"></div>
+    <div id="resultsWrap"></div>
+  </div>
+
+  <!-- ============ KANIT İNCELEMESİ ============ -->
+  <div id="tabReview" class="hidden">
+    <div class="panel-card">
+      <h2>Kanıt incelemesi</h2>
+      <p class="sub">Cevaplar arasında bağlamsal çelişki tespit edilen sorular burada listelenir. Bir ön koşul yeteneğinin bulunmadığı beyan edilmişken ona dayanan yeteneğin üst düzeyde beyan edilmesi, kanıt istenmesini gerektirir. <b>Karar verilmemiş bulgular skorlamaya dâhil edilmez</b> — onaylanana kadar hem paydan hem paydadan çıkarılır.</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
+        <button class="btn btn-ghost" id="btnReviewExport">Karar Dosyasını İndir</button>
+        <button class="btn btn-ghost" id="btnReviewImport">Karar Dosyası Yükle</button>
+        <button class="btn btn-ghost" id="btnReviewClear">Tüm Kararları Sıfırla</button>
+        <input type="file" id="reviewFileInput" accept=".json,application/json" style="display:none">
+        <span id="reviewMsg" style="align-self:center;font-size:.85rem;color:var(--teal);font-weight:700"></span>
+      </div>
+    </div>
+    <div id="reviewWrap"></div>
+  </div>
+
+  <!-- ============ CEVAPLAR ============ -->
+  <div id="tabAnswers" class="hidden"><div id="answersWrap"></div></div>
+
+  <!-- ============ METODOLOJİ ============ -->
+  <div id="tabMethod" class="hidden">
+    <div class="panel-card">
+      <h2>Skorlama formülü</h2>
+      <p class="sub">Her cevap, sorunun kritiklik derecesi ve olgunluk seviyesiyle ağırlıklandırılır.</p>
+      <div class="note">
+        <b>Madde ağırlığı</b> &nbsp;W<sub>i</sub> = Kritiklik(1–4) × OlgunlukÇarpanı(1–5)<br>
+        <b>Kazanılan puan</b> &nbsp;P<sub>i</sub> = (cevap − 1) / 4 × W<sub>i</sub> &nbsp;&nbsp;(cevap: 1–5)<br>
+        <b>Skor</b> &nbsp;= ΣP<sub>i</sub> / ΣW<sub>i</sub> × 100 &nbsp;&nbsp;·&nbsp;&nbsp; <b>Olgunluk seviyesi θ</b> = 1 + 4 × Skor/100<br>
+        Aynı formül; genel skor, her kontrol alanı ve İnsan / Süreç / Teknoloji ekseni için ayrı ayrı uygulanır.
+      </div>
+      <hr class="hr">
+      <h3 style="font-size:1rem">Bağımlılık kapıları</h3>
+      <p style="font-size:.88rem">Master sette tanımlı <span class="mono" id="depCount">—</span> bağımlılık kenarı kullanılır: bir madde, aynı kontrol başlığındaki bir alt olgunluk maddesi karşılanmadan yüksek puan alamaz. Ön koşul maddesinin normalize skoru eşiğin altındaysa (varsayılan 0,50), bağımlı maddenin cevabı ön koşulun cevabına indirgenir ve raporda işaretlenir.</p>
+      <hr class="hr">
+      <h3 style="font-size:1rem">Tutarsızlık kontrolleri</h3>
+      <p style="font-size:.88rem">Cevaplar üç düzeyde çapraz kontrol edilir; işaretlenen sorular <b>Kanıt İncelemesi</b>'nde karar verilene kadar skora girmez.
+        <b>Aynı konuda çelişkili beyan:</b> aynı kontrol alanında aynı konu ailesindeki (arketip) iki sorudan temel olanında bir yetenek «yok» (1/5) beyan edilirken
+        diğerinde aynı boyut 4/5 ve üzeri, ya da temel soru genel olarak yok (ortalama ≤ 1,5) iken diğerinde herhangi bir boyut 3/5 ve üzeri beyan edilirse
+        (ör. «envanter oluşturulmamış» ↔ «varlık sahipleri yazılı olarak atanmış»).
+        <b>Konular arası ön koşul:</b> <span class="mono" id="contraCount">—</span> kural, bir ön koşul yeteneği yokken (ortalama ≤ 2) ona dayanan yeteneğin
+        üst düzeyde (ortalama ≥ 4) beyan edilmesini yakalar (ör. envanter yokken olgun risk yönetimi).
+        <b>Örüntü ve anomali:</b> boyutlar arası aşırı fark, basamak tersliği, düz çizgi cevaplama ve kapsam dışı yoğunluğu raporlanır.</p>
+      <hr class="hr">
+      <h3 style="font-size:1rem">Olgunluk basamağı kilidi</h3>
+      <p style="font-size:.88rem">Olgunluk seviyesi düz bir ortalamayla değil, <b>merdiven mantığıyla</b> belirlenir: bir seviyenin doğrulanmış sayılması için o basamağın ve altındaki tüm ölçülmüş basamakların ağırlıklı skorunun eşiği geçmesi gerekir. Eşiği geçemeyen <b>ilk</b> basamak merdiveni durdurur; üst basamaklar tam puan alsa bile doğrulanmış seviye orada takılı kalır. Ölçülmemiş basamak kilidi tetiklemez, ancak doğrulanmış seviye en yüksek ölçülmüş ve geçilmiş basamakla sınırlıdır. Kilit hem genel skora hem her kontrol alanına ayrı uygulanır.</p>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:.88rem">
+        <label for="lockThreshold"><b>Basamak eşiği (%)</b></label>
+        <input type="number" id="lockThreshold" min="0" max="100" step="5" style="width:90px">
+        <span style="color:var(--slate-2)">varsayılan %80</span>
+      </div>
+      <hr class="hr">
+      <h3 style="font-size:1rem">Kritiklik ağırlıkları</h3>
+      <p style="font-size:.88rem;color:var(--slate)">Değerler yalnızca bu tarayıcıda saklanır ve yüklü sonuç anında yeniden hesaplanır.</p>
+      <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Kritiklik</th><th>Ağırlık</th><th>Soru sayısı (banka)</th></tr></thead><tbody id="critBody"></tbody></table></div>
+      <h3 style="font-size:1rem;margin-top:24px">Olgunluk çarpanları</h3>
+      <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Olgunluk seviyesi</th><th>Etiket</th><th>Çarpan</th><th>Soru sayısı (banka)</th></tr></thead><tbody id="mlBody"></tbody></table></div>
+      <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-primary" id="btnSaveW">Kaydet</button>
+        <button class="btn btn-ghost" id="btnResetW">Varsayılana Dön</button>
+        <span id="wMsg" style="align-self:center;font-size:.85rem;color:var(--teal);font-weight:700"></span>
+      </div>
+    </div>
+    <div class="panel-card">
+      <h2>Olgunluk seviyeleri</h2>
+      <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Aralık</th><th>Seviye</th><th>Anlamı</th></tr></thead><tbody>
+        <tr><td class="mono">θ &lt; 1,8</td><td><span class="lvl-chip" style="background:var(--l1)">1</span></td><td>Başlangıç öncesi — kontroller tanımsız, kişiye bağlı.</td></tr>
+        <tr><td class="mono">1,8 – 2,6</td><td><span class="lvl-chip" style="background:var(--l2)">2</span></td><td>Tekrarlanabilir — uygulama var ancak dokümante ve tutarlı değil.</td></tr>
+        <tr><td class="mono">2,6 – 3,4</td><td><span class="lvl-chip" style="background:var(--l3)">3</span></td><td>Tanımlanmış — yazılı, onaylı ve genel olarak uygulanıyor.</td></tr>
+        <tr><td class="mono">3,4 – 4,2</td><td><span class="lvl-chip" style="background:var(--l4)">4</span></td><td>Yönetilen — ölçülüyor, izleniyor, periyodik gözden geçiriliyor.</td></tr>
+        <tr><td class="mono">θ ≥ 4,2</td><td><span class="lvl-chip" style="background:var(--l5)">5</span></td><td>Optimize — otomatize, entegre ve sürekli iyileştiriliyor.</td></tr>
+      </tbody></table></div>
+    </div>
+  </div>
+
+  <!-- ============ SORU BANKASI ============ -->
+  <div id="tabBank" class="hidden">
+    <div class="panel-card">
+      <h2>Soru bankası</h2>
+      <p class="sub" id="bankSub">—</p>
+      <div class="bank-state" id="bankState"></div>
+      <div class="bank-toolbar">
+        <button class="btn btn-primary" id="btnQNew" type="button">Yeni Soru</button>
+        <button class="btn btn-ghost" id="btnBankXlsxOut" type="button">Excel'e Aktar</button>
+        <button class="btn btn-ghost" id="btnBankXlsxIn" type="button">Excel'den Yükle</button>
+        <button class="btn btn-ghost" id="btnBankJsonOut" type="button">Yedek İndir (JSON)</button>
+        <button class="btn btn-ghost" id="btnBankJsonIn" type="button">Yedekten Yükle</button>
+        <button class="btn btn-ghost danger" id="btnBankReset" type="button">Varsayılana Dön</button>
+        <input type="file" id="bankXlsxFile" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" class="hidden">
+        <input type="file" id="bankJsonFile" accept=".json,application/json" class="hidden">
+      </div>
+      <div id="bankMsg"></div>
+      <div class="bank-filters">
+        <select id="fltArea"></select>
+        <select id="fltArch"><option value="">Tüm kontrol arketipleri</option></select>
+        <select id="fltMl"><option value="">Tüm olgunluk seviyeleri</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+        <select id="fltCrit"><option value="">Tüm kritiklikler</option><option value="4">Kritik</option><option value="3">Yüksek</option><option value="2">Orta</option><option value="1">Düşük</option></select>
+        <input type="search" id="fltText" placeholder="Metinde ara…" style="min-width:200px">
+      </div>
+      <div id="bankCount" style="font-size:.82rem;color:var(--slate-2);margin-bottom:10px"></div>
+      <div id="bankList"></div>
+    </div>
+    <div class="panel-card">
+      <h2>Kapsam soruları</h2>
+      <p class="sub">Ankette ilk sayfada sorulur; «Hayır» yanıtı ilgili kapsam etiketindeki soruları ankete hiç getirmez. Metin ve varsayılan cevap düzenlenebilir.</p>
+      <div id="scopeEdit"></div>
+    </div>
+  </div>
+
+  <!-- ============ SORU DÜZENLEME ============ -->
+  <div id="qEditor" class="q-editor hidden" role="dialog" aria-modal="true" aria-labelledby="qEdTitle">
+    <div class="q-editor-box">
+      <h2 id="qEdTitle">Soru</h2>
+      <div id="qEdBody"></div>
+      <div class="gate-err" id="qEdErr"></div>
+      <div class="q-editor-actions">
+        <button class="btn btn-primary" id="btnQSave" type="button">Kaydet</button>
+        <button class="btn btn-ghost" id="btnQCancel" type="button">Vazgeç</button>
+        <button class="btn btn-ghost danger" id="btnQDelete" type="button">Soruyu Sil</button>
+      </div>
+    </div>
+  </div>
+  <!-- ============ GÜVENLİK ============ -->
+  <div id="tabSecurity" class="hidden">
+    <div class="panel-card">
+      <h2>Oturum ve iki adımlı doğrulama</h2>
+      <p class="sub">Panel bu dosyada yönetici parolasıyla şifreli olarak saklanır. İki adımlı doğrulama kurulursa girişte parolaya ek olarak
+        Kimlik Doğrulayıcı uygulamasındaki 6 haneli kod istenir. Kurmak veya kapatmak bu dosyanın yeni bir kopyasını indirir; eski dosyayı yenisiyle değiştirin.</p>
+      <div id="tfaBanner" class="note hidden" style="margin-bottom:16px"></div>
+      <div id="tfaHolder"></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-bottom">
+    <div class="container">
+      <span>© <span id="year"></span> Scale Teknoloji. Tüm hakları saklıdır.</span>
+      <span id="footMeta"></span>
+    </div>
+  </div>
+</footer>
