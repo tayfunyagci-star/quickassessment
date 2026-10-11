@@ -3,9 +3,13 @@
 import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
-import { ROOT } from "./lib.mjs";
+import { ROOT, TEST_PASSWORD, BUILD } from "./lib.mjs";
 
 const filter = process.argv[2] || "";
+/* Test build'i: bilinen test parolasıyla, gerçek çıktıdan ayrı klasöre. */
+const b = spawnSync(process.execPath, [path.join(ROOT, "scripts", "build.mjs")], { stdio: "inherit",
+  env: { ...process.env, QA_ADMIN_PASSWORD: TEST_PASSWORD, QA_BUILD_OUT: BUILD } });
+if(b.status !== 0){ console.error("test build'i başarısız"); process.exit(1); }
 const dir = path.join(ROOT, "tests");
 const files = fs.readdirSync(dir).filter(f => /^t\d+_.*\.mjs$/.test(f) && f.includes(filter)).sort();
 let failed = 0;

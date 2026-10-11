@@ -3,15 +3,30 @@
    ---------------------------------------------------------------------
    Kaynak (src/) + sabit sürümlü bağımlılıklar (node_modules/) → tek
    dosyalık, çevrimdışı çalışan HTML çıktıları (_build/).
-     npm ci && npm run build
+     npm ci
+     QA_ADMIN_PASSWORD='…' npm run build
+   Ortam değişkenleri:
+     QA_ADMIN_PASSWORD  panel parolası (zorunlu, en az 12 karakter). Panel
+                        içeriği bu parolayla şifrelenir; parola çıktıda
+                        hiçbir biçimde bulunmaz.
+     QA_BUILD_OUT       çıktı klasörü (varsayılan: _build)
    ===================================================================== */
 import fs from "node:fs";
 import path from "node:path";
 import vm from "node:vm";
 import { fileURLToPath } from "node:url";
+import crypto from "node:crypto";
+import zlib from "node:zlib";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const OUT = path.join(ROOT, "_build");
+const OUT = path.resolve(ROOT, process.env.QA_BUILD_OUT || "_build");
+const PASSWORD = process.env.QA_ADMIN_PASSWORD || "";
+if(PASSWORD.length < 12){
+  console.error("HATA: QA_ADMIN_PASSWORD ortam değişkeni tanımlı değil ya da 12 karakterden kısa.\n" +
+                "Örnek: QA_ADMIN_PASSWORD='uzun-ve-tahmin-edilemez-parola' npm run build");
+  process.exit(1);
+}
+const KDF_ITER = 600000;
 const rd = rel => fs.readFileSync(path.join(ROOT, rel), "utf8");
 const nm = rel => path.join(ROOT, "node_modules", rel);
 const b64 = abs => fs.readFileSync(abs).toString("base64");
@@ -47,7 +62,7 @@ function fontFaces(){
 const CSP = "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; font-src data:; " +
             "img-src data: blob:; connect-src 'none'; form-action 'none'; base-uri 'none'; frame-src 'none'; object-src 'none'";
 
-function head(title, extraMeta, themeJs, css){
+function head(title, extraMeta, themeJs, css, fontsCss){
   return `<!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -59,7 +74,7 @@ function head(title, extraMeta, themeJs, css){
 ${extraMeta}<title>${title}</title>
 <script>${scriptSafe(themeJs.trim())}</script>
 <style id="qaFonts">
-${FONTS}
+${fontsCss}
 </style>
 <style>
 ${css}
@@ -72,7 +87,7 @@ function buildSurveyTemplate(){
   const engine = rd("src/shared/engine.js");
   const html = `${head("Hızlı Değerlendirme | Siber Güvenlik Olgunluk Anketi — Scale Bilgi Güvenliği ve Danışmanlık",
     `<meta name="description" content="Kurumunuzun siber güvenlik olgunluğunu ölçen, cevaplarınıza göre uyarlanan kısa bir öz-değerlendirme anketi.">\n`,
-    rd("src/survey/theme.js"), rd("src/survey/survey.css"))}
+    rd("src/survey/theme.js"), rd("src/survey/survey.css"), FONTS_MARKER)}
 <body>
 ${rd("src/survey/body.html")}
 <script>
@@ -87,25 +102,82 @@ ${scriptSafe(rd("src/survey/toggle.js"))}
 </html>
 `;
   if(!html.includes("/*__SURVEY__*/null/*__/SURVEY__*/")) throw new Error("anket şablonunda SURVEY işaretçisi yok");
+  /* Yazı tipleri panelde zaten gömülü; anket üretilirken panel kendi #qaFonts içeriğini buraya koyar. */
+  if(!html.includes(FONTS_MARKER)) throw new Error("anket şablonunda yazı tipi işaretçisi yok");
   return html;
 }
 
-/* ---------- analiz paneli ---------- */
-function buildPanel(surveyTemplate){
+/* ---------- analiz paneli: şifreli içerik ---------- */
+function buildPayload(surveyTemplate){
   const bank = JSON.parse(rd("src/data/bank.json"));
-  return `${head("Siber Güvenlik Olgunluk — Analiz Paneli | Scale Teknoloji", "", rd("src/panel/theme.js"), rd("src/panel/panel.css"))}
+  const script = [
+    "\"use strict\";",
+    "/* VERİ — master soru bankası ve anket şablonu (build sırasında gömülür) */",
+    `const BANK = ${jsonForScript(bank)};`,
+    `const SURVEY_TEMPLATE = ${jsonForScript(surveyTemplate)};`,
+    rd("src/shared/engine.js"),
+    rd("src/panel/panel.js"),
+    rd("src/panel/security.js"),
+  ].join("\n");
+  return { body: rd("src/panel/body.html"), script };
+}
+function encryptPayload(obj){
+  const gz = zlib.gzipSync(Buffer.from(JSON.stringify(obj), "utf8"), { level: 9 });
+  const salt = crypto.randomBytes(16), iv = crypto.randomBytes(12);
+  const key = crypto.pbkdf2Sync(PASSWORD, salt, KDF_ITER, 32, "sha256");
+  const c = crypto.createCipheriv("aes-256-gcm", key, iv);
+  const ct = Buffer.concat([c.update(gz), c.final(), c.getAuthTag()]);   /* WebCrypto: şifreli metin || etiket */
+  return { v:1, alg:"PBKDF2-SHA256/AES-256-GCM", iter: KDF_ITER, gz: true,
+           salt: salt.toString("base64"), iv: iv.toString("base64"), ct: ct.toString("base64") };
+}
+
+/* ---------- analiz paneli: dış kabuk (giriş kapısı) ---------- */
+function buildPanel(payload){
+  const gate = rd("src/panel/gate.js").replace("/*@PAYLOAD*/null/*@END_PAYLOAD*/", () => `/*@PAYLOAD*/${jsonForScript(payload)}/*@END_PAYLOAD*/`);
+  return `${head("Siber Güvenlik Olgunluk — Analiz Paneli | Scale Teknoloji", "", rd("src/panel/theme.js"), rd("src/panel/panel.css"), FONTS)}
 <body>
-${rd("src/panel/body.html")}
-<script>
-"use strict";
+${rd("src/panel/gate.html")}
+<script id="libJszip">${scriptSafe(fs.readFileSync(nm("jszip/dist/jszip.min.js"), "utf8"))}</script>
+<script id="libXlsx">${scriptSafe(fs.readFileSync(nm("xlsx/dist/xlsx.mini.min.js"), "utf8"))}</script>
+<script id="libQr">${scriptSafe(fs.readFileSync(nm("qrcode-generator/qrcode.js"), "utf8"))}</script>
+<script id="qaVersion">
 ${scriptSafe(rd("src/panel/version.js"))}
-/* =====================================================================
-   VERİ — master soru bankası ve anket şablonu (build sırasında gömülür)
-   ===================================================================== */
-const BANK = ${jsonForScript(bank)};
-const SURVEY_TEMPLATE = ${jsonForScript(surveyTemplate)};
-${scriptSafe(rd("src/shared/engine.js"))}
-${scriptSafe(rd("src/panel/panel.js"))}
+</script>
+<script id="qaTotp">
+${scriptSafe(rd("src/shared/totp.js"))}
+</script>
+<script id="qaGate">
+${scriptSafe(gate)}
+</script>
+<script id="qaCapture">window.__QA_PRISTINE = "<!DOCTYPE html>\\n" + document.documentElement.outerHTML; GATE.init();</script>
+</body>
+</html>
+`;
+}
+
+/* ---------- Kimlik Doğrulayıcı ---------- */
+function buildAuth(){
+  const csp = "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'";
+  return `<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="${csp}">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex">
+<title>Kimlik Doğrulayıcı — Scale Analiz Paneli</title>
+<style>
+${rd("src/auth/auth.css")}
+</style>
+</head>
+<body>
+${rd("src/auth/body.html")}
+<script>
+${scriptSafe(rd("src/shared/totp.js"))}
+</script>
+<script>
+${scriptSafe(rd("src/auth/auth.js"))}
 </script>
 </body>
 </html>
@@ -129,17 +201,29 @@ function forbid(name, html, tokens){
 const NETWORK_TOKENS = ["fonts.googleapis.com", "fonts.gstatic.com", "cdnjs.", "unpkg.com", "jsdelivr", "fetch(", "XMLHttpRequest", "sendBeacon", "WebSocket("];
 
 /* ---------- çalıştır ---------- */
+const FONTS_MARKER = "/*@FONTS@*/";
 const FONTS = fontFaces();
 const survey = buildSurveyTemplate();
 syntaxCheck("anket", survey.replace("/*__SURVEY__*/null/*__/SURVEY__*/", "{}"));
 forbid("anket", survey, NETWORK_TOKENS.concat(["otp-servisi", "GONDERIM"]));
 
-const panel = buildPanel(survey);
+const payload = buildPayload(survey);
+syntaxCheck("panel içeriği", `<script>${payload.script}</script>`);
+const panel = buildPanel(encryptPayload(payload));
 syntaxCheck("panel", panel);
 forbid("panel", panel, NETWORK_TOKENS);
+/* Dış kabukta (şifresiz kısım) panelin iç bilgisi ve parola bulunmamalı. */
+forbid("panel kabuğu", panel, [PASSWORD, "computeResults", "CONTRA_RULES", "SURVEY_TEMPLATE", "UCT.01.001", "REG_DEFS", "ladderLock"]);
+
+const auth = buildAuth();
+syntaxCheck("kimlik doğrulayıcı", auth);
+forbid("kimlik doğrulayıcı", auth, NETWORK_TOKENS);
 
 fs.mkdirSync(OUT, { recursive: true });
-const outPanel = path.join(OUT, "Siber_Olgunluk_Analiz_Paneli.html");
-fs.writeFileSync(outPanel, panel, "utf8");
 const kb = n => (n / 1024).toFixed(0) + " KB";
-console.log(`ok  ${path.relative(ROOT, outPanel)}  ${kb(Buffer.byteLength(panel))}  (anket şablonu ${kb(Buffer.byteLength(survey))})`);
+for(const [name, html] of [["Siber_Olgunluk_Analiz_Paneli.html", panel], ["Kimlik_Dogrulayici.html", auth]]){
+  const out = path.join(OUT, name);
+  fs.writeFileSync(out, html, "utf8");
+  console.log(`ok  ${path.relative(ROOT, out)}  ${kb(Buffer.byteLength(html))}`);
+}
+console.log(`    (anket şablonu ${kb(Buffer.byteLength(survey))} + panelin yazı tipleri; içerik PBKDF2 ${KDF_ITER} tur / AES-256-GCM)`);

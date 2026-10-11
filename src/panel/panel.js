@@ -502,15 +502,30 @@ async function decryptEnvelope(env, pw){
 /* =====================================================================
    ARAYÜZ — sekmeler
    ===================================================================== */
+/* Panelin üç fonksiyonu: Anket Üretimi (gen), Anket Analizi (analiz), Soru Yönetimi (soru).
+   Merkez (hub) açılış ekranıdır; sekme çubuğu yalnızca bulunulan fonksiyonun sekmelerini gösterir. */
+const TAB_SECTION = { hub:null, gen:"gen", review:"analiz", results:"analiz", answers:"analiz",
+                      bank:"soru", method:"soru", security:null };
 function switchTab(t){
-  document.querySelectorAll(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === t));
-  ["gen","load","review","results","answers","method","bank"].forEach(id => {
+  if(t === "load") t = "hub";
+  const sec = TAB_SECTION[t];
+  document.getElementById("tabsBar").classList.toggle("hidden", t === "hub");
+  document.querySelectorAll("#tabsBar .tab-btn").forEach(b => {
+    b.classList.toggle("active", b.dataset.tab === t);
+    if(b.dataset.sec) b.classList.toggle("hidden", b.dataset.sec !== sec);
+  });
+  Object.keys(TAB_SECTION).forEach(id => {
     const el = document.getElementById("tab" + id.charAt(0).toUpperCase() + id.slice(1));
     if(el) el.classList.toggle("hidden", id !== t);
   });
+  if(t === "security" && typeof renderSecurity === "function") renderSecurity();
   window.scrollTo({top:0});
 }
-document.querySelectorAll(".tab-btn").forEach(b => b.addEventListener("click", () => { if(!b.disabled) switchTab(b.dataset.tab); }));
+document.querySelectorAll("#tabsBar .tab-btn").forEach(b => b.addEventListener("click", () => { if(!b.disabled) switchTab(b.dataset.tab); }));
+document.querySelectorAll(".hub-card[data-goto]").forEach(b => b.addEventListener("click", () => switchTab(b.dataset.goto)));
+document.getElementById("btnHome").addEventListener("click", () => switchTab("hub"));
+document.getElementById("btnSecurity").addEventListener("click", () => switchTab("security"));
+document.getElementById("btnLogout").addEventListener("click", () => location.reload());
 
 /* =====================================================================
    ANKET ÜRET SEKMESİ
@@ -627,9 +642,10 @@ document.getElementById("btnGenerate").addEventListener("click", () => {
   const note = document.getElementById("genNote").value.trim();
   const data = anketVerisi(full);
   const marker = SURVEY_MARKER;
-  const json = JSON.stringify(data);
+  /* '<' kaçışlanır: soru metinleri betiği erken kapatamaz. */
+  const json = JSON.stringify(data).replace(/</g, "\\u003c");
   if(SURVEY_TEMPLATE.indexOf(marker) === -1){ document.getElementById("genMsg").innerHTML = '<div class="note warn">Şablon işaretçisi bulunamadı.</div>'; return; }
-  const html = SURVEY_TEMPLATE.replace(marker, () => json);
+  const html = SURVEY_TEMPLATE.replace(marker, () => json).replace("/*@FONTS@*/", () => gomuluFontlar());
   const k = anketKapsami(full);
   const lo = k.lo, hi = k.hi;
   const fname = "hizli-degerlendirme_" + genTax + (org ? "_" + slug(org) : "") + (note ? "_" + slug(note) : "") + ".html";
@@ -638,7 +654,7 @@ document.getElementById("btnGenerate").addEventListener("click", () => {
     '<div class="note"><b>' + esc(fname) + '</b> indirildi. ' + full.length + ' kontrol alanı, ankete gömülen havuz ' +
     full.reduce((a,x) => a + x.pool.length, 0) + ' madde; katılımcıya en geniş kapsamda ' + lo + '–' + hi +
     ' kontrol sorusu (' + (lo*3) + '–' + (hi*3) + ' İ/S/T cevabı) sorulacak. ' +
-    'Kapsam soruları anketin ilk sayfasında yer alır. Dosya tek başına çalışır: internet bağlantısı yalnızca yazı tipleri için gerekir, cevaplar cihazdan çıkmaz.</div>';
+    'Kapsam soruları anketin ilk sayfasında yer alır. Dosya tek başına ve internetsiz çalışır (ağ erişimi kapalı); cevaplar cihazdan kendiliğinden çıkmaz.</div>';
 });
 
 /* =====================================================================
@@ -1307,7 +1323,13 @@ document.getElementById("fileInput").addEventListener("change", e => { if(e.targ
 ["dragenter","dragover"].forEach(ev => uploadBox.addEventListener(ev, e => { e.preventDefault(); uploadBox.classList.add("drag"); }));
 ["dragleave","drop"].forEach(ev => uploadBox.addEventListener(ev, e => { e.preventDefault(); uploadBox.classList.remove("drag"); }));
 uploadBox.addEventListener("drop", e => { const f = e.dataTransfer.files[0]; if(f) showFile(f); });
-function showFile(f){ chosenFile = f; document.getElementById("uploadFilename").textContent = f.name; document.getElementById("decryptErr").textContent = ""; }
+function showFile(f){
+  chosenFile = f;
+  document.getElementById("uploadFilename").textContent = f.name;
+  document.getElementById("decryptErr").textContent = "";
+  document.getElementById("pwInput").focus();
+}
+document.getElementById("pwInput").addEventListener("keydown", e => { if(e.key === "Enter") document.getElementById("btnDecrypt").click(); });
 
 document.getElementById("btnDecrypt").addEventListener("click", async () => {
   const err = document.getElementById("decryptErr");
@@ -1320,34 +1342,11 @@ document.getElementById("btnDecrypt").addEventListener("click", async () => {
     const env = JSON.parse(txt);
     if(!env || !env.ciphertext) throw new Error("Bu dosya geçerli bir şifreli cevap dosyası değil.");
     const sub = await decryptEnvelope(env, pw);
+    document.getElementById("pwInput").value = "";
     loadSubmission(sub);
   }catch(e){ err.textContent = e.message || "Dosya çözülemedi."; }
 });
-document.getElementById("btnNewLoad").addEventListener("click", () => { switchTab("load"); });
-document.getElementById("btnDemo").addEventListener("click", () => loadSubmission(buildDemo()));
-
-function buildDemo(){
-  const full = buildFullAreas(genTax);
-  const resolved = resolveAreas(full, [], currentTarget()).filter(a => !a.scopeOut);
-  const results = {}, areaNames = {};
-  resolved.forEach((a,ai) => {
-    areaNames[a.c] = a.n;
-    if(ai === resolved.length - 1 && resolved.length > 4){ results[a.c] = { na:true, reason:"user", items:[] }; return; }
-    const base = 1.6 + (ai % 5) * 0.55;
-    const pick = () => {
-      let r = Math.round(base + (Math.random()*1.4 - 0.7));
-      return Math.max(1, Math.min(5, r));
-    };
-    const items = a.pool.slice(0, a.askMax).map(p => ({
-      id:p.id, q:p.q, t:p.t, arch:p.arch, k:p.k, w:p.w, ml:p.m,
-      r: { I:pick(), S:pick(), T:pick() }
-    }));
-    results[a.c] = { na:false, items };
-  });
-  return { type:"aoc_submission_v4", orgName:"Örnek Sanayi A.Ş. (DEMO)", submittedAt:new Date().toISOString(),
-           taxonomy:genTax, taxonomyName: genTax === "nist" ? "NIST CSF 2.0" : "UCT Kontrol Taksonomisi",
-           bankVersion: BANK.v, demo:true, areaNames, results };
-}
+document.getElementById("btnNewLoad").addEventListener("click", () => { switchTab("hub"); });
 
 function loadSubmission(sub){
   currentSub = sub;
@@ -1357,6 +1356,10 @@ function loadSubmission(sub){
   document.getElementById("tabBtnAnswers").disabled = false;
   document.getElementById("tabBtnReview").disabled = false;
   renderResults(); renderAnswers(); renderReview();
+  const last = document.getElementById("hubLast");
+  last.classList.remove("hidden");
+  document.getElementById("hubLastSub").textContent = (sub.orgName || "Kurum") + " · " +
+    new Date(sub.submittedAt).toLocaleDateString("tr-TR");
   switchTab(currentState.reviewPending ? "review" : "results");
 }
 

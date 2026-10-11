@@ -703,3 +703,55 @@ html[data-tema="koyu"] .drill-note{ background:var(--bg-raised); color:var(--tex
 /* --- yazı tipi ölçek düzeltmesi: IBM Plex, Lato'dan biraz daha geniştir --- */
 html[data-tema="koyu"] body{ font-size:15.5px; }
 html[data-tema="koyu"] h1, html[data-tema="koyu"] h2, html[data-tema="koyu"] h3, html[data-tema="koyu"] h4{ letter-spacing:-.01em; }
+
+/* =====================================================================
+   v2.0 — giriş kapısı, Değerlendirme Merkezi ve güvenlik bileşenleri
+   (eski değişken adları her iki temada da yeniden eşlendiği için
+   doğrudan kullanılır)
+   ===================================================================== */
+.sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
+.gate-screen{ min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px 16px; background:var(--cream); }
+.gate-card{ width:100%; max-width:420px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius-lg); padding:32px 30px; box-shadow:var(--shadow); }
+.gate-card .brandmark{ margin-bottom:22px; }
+.gate-card h1{ font-size:1.4rem; margin:0 0 .3em; }
+.gate-hint{ font-size:.9rem; color:var(--slate); margin:0 0 18px; }
+.gate-card input{ width:100%; margin-bottom:12px; }
+.gate-card #gateOtp{ letter-spacing:.3em; text-align:center; font-size:1.15rem; }
+.gate-card .btn{ width:100%; margin-top:6px; }
+.gate-card .gate-err:empty{ min-height:0; margin:0; }
+.gate-foot{ font-size:.74rem; color:var(--slate-2); margin:18px 0 0; line-height:1.5; }
+
+.hub-grid{ display:grid; grid-template-columns:minmax(0,1.6fr) minmax(0,1fr); gap:22px; align-items:start; }
+@media (max-width:900px){ .hub-grid{ grid-template-columns:1fr; } }
+.hub-main .upload-box{ padding:40px 28px; }
+.upload-box.drag{ border-color:var(--teal); background:var(--mist); }
+.hub-side{ display:flex; flex-direction:column; gap:14px; }
+.hub-card{ display:flex; gap:14px; align-items:flex-start; text-align:left; width:100%; background:var(--card); border:1px solid var(--line);
+  border-radius:var(--radius-lg); padding:20px 20px; color:var(--ink); box-shadow:var(--shadow-sm); transition:border-color .15s ease, transform .15s ease; }
+.hub-card:hover{ border-color:var(--teal); transform:translateY(-1px); }
+.hub-ico{ flex:0 0 40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; background:var(--mist); color:var(--teal); border:1px solid var(--line); }
+.hub-ico svg{ width:20px; height:20px; }
+.hub-txt b{ display:block; font-family:var(--font-display); font-size:1rem; color:var(--navy); margin-bottom:.25em; }
+.hub-txt small{ display:block; font-size:.84rem; color:var(--slate); line-height:1.5; }
+.tab-btn.tab-home{ color:var(--teal); margin-right:10px; }
+
+.tfa-panel h3{ font-size:1rem; display:flex; align-items:center; gap:10px; }
+.tfa-steps{ font-size:.88rem; color:var(--slate); padding-left:1.2em; margin:0 0 18px; }
+.tfa-steps li{ margin-bottom:.4em; }
+.tfa-grid{ display:grid; grid-template-columns:200px minmax(0,1fr); gap:24px; align-items:start; }
+@media (max-width:760px){ .tfa-grid{ grid-template-columns:1fr; } }
+.tfa-qr{ background:#fff; border-radius:var(--radius-sm); padding:8px; border:1px solid var(--line); }
+.tfa-qr svg{ display:block; width:100%; height:auto; }
+.tfa-secret,.tfa-uri{ font-size:.82rem; word-break:break-all; background:var(--mist); border:1px solid var(--line); border-radius:var(--radius-sm); padding:10px 12px; margin:6px 0 14px; color:var(--ink); }
+.tfa-secret{ font-size:1rem; letter-spacing:.08em; }
+.tfa-actions{ display:flex; gap:10px; flex-wrap:wrap; margin:6px 0 16px; }
+.tfa-status{ font-family:var(--font-display); font-size:.66rem; letter-spacing:.1em; text-transform:uppercase; padding:.25em .7em; border-radius:99px; border:1px solid var(--line); }
+.tfa-status.on{ color:var(--teal); border-color:var(--teal); }
+.btn.danger{ color:var(--coral); border-color:var(--coral); }
+.gate-err:empty{ display:none !important; }
+.brand-actions{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+@media (max-width:760px){
+  .brand-actions .bank-pill{ display:none; }
+  .brand-actions .tema-btn span{ display:none; }
+  .brand-actions .tema-btn{ padding:.5em .6em; }
+}

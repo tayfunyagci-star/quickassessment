@@ -12,35 +12,83 @@
       <span class="bm-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg></span>
       <span>Analiz Paneli<small>Siber Güvenlik Olgunluk Değerlendirmesi</small></span>
     </div>
-    <div style="display:flex;align-items:center;gap:12px">
+    <div class="brand-actions">
       <span class="bank-pill" id="bankPill">—</span>
+      <button type="button" class="tema-btn" id="btnHome" title="Değerlendirme Merkezi">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+        <span>Merkez</span>
+      </button>
+      <button type="button" class="tema-btn" id="btnSecurity" title="İki adımlı doğrulama ve oturum">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/></svg>
+        <span>Güvenlik</span>
+      </button>
       <button type="button" class="tema-btn" id="btnTema" title="Açık / koyu tema" aria-pressed="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg>
         <span id="temaLbl">Koyu</span>
+      </button>
+      <button type="button" class="tema-btn" id="btnLogout" title="Oturumu kapat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+        <span>Çıkış</span>
       </button>
     </div>
   </div>
 </div>
 
 <div id="app">
-  <div class="app-head">
-    <p class="ref">Danışman Konsolu</p>
-    <h1 style="font-size:1.7rem">Anket üretimi, skorlama ve olgunluk analizi</h1>
-    <p class="lede" style="font-size:.95rem">Kontrol çerçevesini seçip kuruma özel bir hızlı değerlendirme anketi üretin; dönen şifreli dosyayı burada çözerek kontrol alanı ve İnsan&nbsp;/&nbsp;Süreç&nbsp;/&nbsp;Teknoloji boyutlarında olgunluk skorunu görün.</p>
+  <div class="tabs hidden" id="tabsBar">
+    <button class="tab-btn tab-home" data-tab="hub">&larr; Değerlendirme Merkezi</button>
+    <button class="tab-btn" data-tab="gen" data-sec="gen">Anket Üret</button>
+    <button class="tab-btn" data-tab="review" data-sec="analiz" id="tabBtnReview" disabled>Kanıt İncelemesi</button>
+    <button class="tab-btn" data-tab="results" data-sec="analiz" id="tabBtnResults" disabled>Analiz &amp; Skorlama</button>
+    <button class="tab-btn" data-tab="answers" data-sec="analiz" id="tabBtnAnswers" disabled>Verilen Cevaplar</button>
+    <button class="tab-btn" data-tab="bank" data-sec="soru">Soru Bankası</button>
+    <button class="tab-btn" data-tab="method" data-sec="soru">Metodoloji &amp; Ağırlıklar</button>
   </div>
 
-  <div class="tabs">
-    <button class="tab-btn active" data-tab="gen">Anket Üret</button>
-    <button class="tab-btn" data-tab="load">Sonuç Yükle</button>
-    <button class="tab-btn" data-tab="review" id="tabBtnReview" disabled>Kanıt İncelemesi</button>
-    <button class="tab-btn" data-tab="results" id="tabBtnResults" disabled>Analiz &amp; Skorlama</button>
-    <button class="tab-btn" data-tab="answers" id="tabBtnAnswers" disabled>Verilen Cevaplar</button>
-    <button class="tab-btn" data-tab="method">Metodoloji &amp; Ağırlıklar</button>
-    <button class="tab-btn" data-tab="bank">Soru Bankası</button>
+  <!-- ============ DEĞERLENDİRME MERKEZİ ============ -->
+  <div id="tabHub">
+    <div class="app-head">
+      <p class="ref">Değerlendirme Merkezi</p>
+      <h1 style="font-size:1.7rem">Ne yapmak istiyorsunuz?</h1>
+      <p class="lede" style="font-size:.95rem">Kurumdan gelen şifreli cevap dosyasını aşağıdaki alana bırakıp şifresini girin; analiz doğrudan açılır.
+        Yeni bir anket üretmek veya soru bankasını düzenlemek için sağdaki kartları kullanın.</p>
+    </div>
+    <div class="hub-grid">
+      <section class="panel-card hub-main" aria-labelledby="hubAnalizTtl">
+        <p class="ref">Anket Analizi</p>
+        <h2 id="hubAnalizTtl">Şifreli cevap dosyasını açın</h2>
+        <p class="sub">Anketin ürettiği <span class="mono">.json</span> dosyası ve kurumun ayrı kanaldan ilettiği 8 haneli şifre gereklidir.
+          Çözme işlemi tamamen bu tarayıcıda yapılır; hiçbir veri gönderilmez.</p>
+        <div class="upload-box" id="uploadBox">
+          <svg class="up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+          <p style="margin:0 0 4px">Dosyayı buraya sürükleyip bırakın</p>
+          <input type="file" id="fileInput" accept="application/json,.json" class="hidden">
+          <button class="btn btn-ghost" id="btnChooseFile" type="button" style="margin-top:10px">Dosya Seç</button>
+          <div class="upload-filename" id="uploadFilename"></div>
+          <input type="text" id="pwInput" class="pw-input" placeholder="8 haneli şifre" maxlength="12" inputmode="numeric" autocomplete="off">
+          <div class="gate-err" id="decryptErr"></div>
+          <button class="btn btn-primary" id="btnDecrypt" style="margin-top:6px">Çöz ve Analize Geç</button>
+        </div>
+      </section>
+      <div class="hub-side">
+        <button type="button" class="hub-card" data-goto="gen">
+          <span class="hub-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></span>
+          <span class="hub-txt"><b>Anket Üretimi</b><small>Çerçeve ve uzunluk seçip kuruma özel, tek dosyalık çevrimdışı anket üretin.</small></span>
+        </button>
+        <button type="button" class="hub-card" data-goto="bank">
+          <span class="hub-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg></span>
+          <span class="hub-txt"><b>Soru Yönetimi</b><small>Soru bankası, kapsam soruları, bağımlılıklar, ağırlıklar ve olgunluk eşiği.</small></span>
+        </button>
+        <button type="button" class="hub-card hidden" id="hubLast" data-goto="results">
+          <span class="hub-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg></span>
+          <span class="hub-txt"><b>Açık analize dön</b><small id="hubLastSub">—</small></span>
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- ============ ANKET ÜRET ============ -->
-  <div id="tabGen">
+  <div id="tabGen" class="hidden">
   <div class="gen-layout">
     <nav class="gen-nav" id="genNav" aria-label="Anket üretim adımları">
       <button type="button" class="gen-step active" data-step="1"><b>1</b><span>Taksonomi ve çerçeve</span></button>
@@ -96,27 +144,6 @@
   </div>
 </div>
 
-<!-- ============ SONUÇ YÜKLE ============ -->
-  <div id="tabLoad" class="hidden">
-    <div class="panel-card">
-      <h2>Şifreli cevap dosyasını açın</h2>
-      <p class="sub">Anket uygulamasının ürettiği <span class="mono">.json</span> dosyası ve kurumun ilettiği 8 haneli şifre gereklidir. Çözme işlemi tamamen bu tarayıcıda yapılır; hiçbir veri gönderilmez.</p>
-      <div class="upload-box" id="uploadBox">
-        <svg class="up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
-        <p style="margin:0 0 4px">Dosyayı buraya sürükleyin veya seçin</p>
-        <input type="file" id="fileInput" accept="application/json,.json" class="hidden">
-        <button class="btn btn-ghost" id="btnChooseFile" type="button" style="margin-top:10px">Dosya Seç</button>
-        <div class="upload-filename" id="uploadFilename"></div>
-        <input type="text" id="pwInput" class="pw-input" placeholder="8 haneli şifre" maxlength="12" inputmode="numeric" autocomplete="off">
-        <div class="gate-err" id="decryptErr"></div>
-        <button class="btn btn-primary" id="btnDecrypt" style="margin-top:6px">Çöz ve Görüntüle</button>
-      </div>
-      <div style="text-align:center;margin-top:20px">
-        <button class="btn btn-ghost" id="btnDemo">Demo verilerle önizleme</button>
-      </div>
-    </div>
-  </div>
-
   <!-- ============ ANALİZ ============ -->
   <div id="tabResults" class="hidden">
     <div class="result-actions">
@@ -127,7 +154,7 @@
       <button class="btn" id="btnPrint">Ham ekran çıktısı</button>
       <button class="btn" id="btnJson">JSON Raporu İndir</button>
       <button class="btn" id="btnCsv">CSV İndir</button>
-      <button class="btn btn-ghost" id="btnNewLoad">Yeni Sonuç Yükle</button>
+      <button class="btn btn-ghost" id="btnNewLoad">Yeni Dosya Aç</button>
     </div>
     <div id="resultsWrap"></div>
   </div>
@@ -211,6 +238,16 @@
       </div>
       <div id="bankCount" style="font-size:.82rem;color:var(--slate-2);margin-bottom:10px"></div>
       <div id="bankList"></div>
+    </div>
+  </div>
+  <!-- ============ GÜVENLİK ============ -->
+  <div id="tabSecurity" class="hidden">
+    <div class="panel-card">
+      <h2>Oturum ve iki adımlı doğrulama</h2>
+      <p class="sub">Panel bu dosyada yönetici parolasıyla şifreli olarak saklanır. İki adımlı doğrulama kurulursa girişte parolaya ek olarak
+        Kimlik Doğrulayıcı uygulamasındaki 6 haneli kod istenir. Kurmak veya kapatmak bu dosyanın yeni bir kopyasını indirir; eski dosyayı yenisiyle değiştirin.</p>
+      <div id="tfaBanner" class="note hidden" style="margin-bottom:16px"></div>
+      <div id="tfaHolder"></div>
     </div>
   </div>
 </div>

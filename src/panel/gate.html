@@ -1,0 +1,18 @@
+<div id="gate" class="gate-screen">
+  <div class="gate-card">
+    <div class="brandmark">
+      <span class="bm-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg></span>
+      <span>Analiz Paneli<small>Siber Güvenlik Olgunluk Değerlendirmesi</small></span>
+    </div>
+    <h1>Giriş</h1>
+    <p class="gate-hint" id="gateHint"></p>
+    <label for="gatePw" class="sr-only">Parola</label>
+    <input type="password" id="gatePw" autocomplete="current-password" placeholder="Parola">
+    <label for="gateOtp" class="sr-only">Doğrulama kodu</label>
+    <input type="text" id="gateOtp" class="hidden mono" inputmode="numeric" maxlength="7" autocomplete="one-time-code" placeholder="6 haneli doğrulama kodu">
+    <div class="gate-err" id="gateErr" role="alert"></div>
+    <button type="button" class="btn btn-primary" id="btnGate">Giriş</button>
+    <p class="gate-foot"><span id="gateVer"></span> · Scale Teknoloji · Danışman aracı — veriler yalnızca bu tarayıcıda işlenir; ağ erişimi kapalıdır.</p>
+  </div>
+</div>
+<div id="appRoot"></div>

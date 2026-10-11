@@ -5,8 +5,11 @@ import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-export const BUILD = path.join(ROOT, "_build");
+/* Testler gerçek parolayı bilmez: run.mjs bu test parolasıyla _build/test altına ayrı bir build alır. */
+export const TEST_PASSWORD = "test-parolasi-Ankara-2026";
+export const BUILD = path.join(ROOT, "_build", "test");
 export const PANEL = path.join(BUILD, "Siber_Olgunluk_Analiz_Paneli.html");
+export const AUTH = path.join(BUILD, "Kimlik_Dogrulayici.html");
 export const TMP = path.join(ROOT, "_build", "test-tmp");
 fs.mkdirSync(TMP, { recursive: true });
 
@@ -25,10 +28,24 @@ export function watch(page, tag, errs){
   });
   page.on("requestfailed", r => { if(!r.url().startsWith("data:") && !r.url().startsWith("blob:")) errs.push(`${tag} request: ${r.url().slice(0, 120)}`); });
   page.on("request", r => { const u = r.url(); if(/^https?:/.test(u)) errs.push(`${tag} network request: ${u.slice(0, 120)}`); });
-  page.on("dialog", d => { errs.push(`${tag} dialog: ${d.message().slice(0, 120)}`); d.dismiss().catch(() => {}); });
+  /* Beklenmeyen diyalog hata sayılır; testin onaylaması gereken diyalog için page.__acceptDialogs = true. */
+  page.on("dialog", d => {
+    if(page.__acceptDialogs){ d.accept().catch(() => {}); return; }
+    errs.push(`${tag} dialog: ${d.message().slice(0, 120)}`); d.dismiss().catch(() => {});
+  });
 }
 
 export const fileUrl = p => "file://" + p;
+
+/* Paneli açar ve giriş yapar (kod verilirse 2FA alanına yazılır). */
+export async function openPanel(page, { file = PANEL, password = TEST_PASSWORD, code = null } = {}){
+  await page.goto(fileUrl(file));
+  await page.waitForSelector("#gatePw");
+  await page.fill("#gatePw", password);
+  if(code != null) await page.fill("#gateOtp", code);
+  await page.click("#btnGate");
+  await page.waitForSelector("#tabHub", { timeout: 20000 });
+}
 
 /* İndirmeyi bekler, TMP altına kaydeder ve yolunu döndürür. */
 export async function download(page, clickFn, name){

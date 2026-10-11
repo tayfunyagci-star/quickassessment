@@ -1,12 +1,12 @@
 /* Anket üret → doldur → şifreli cevabı panelde çöz → analiz. */
-import { launch, watch, download, completeSurvey, fileUrl, PANEL } from "./lib.mjs";
+import { launch, watch, download, completeSurvey, fileUrl, openPanel } from "./lib.mjs";
 import { check, done } from "./assert.mjs";
 
 const b = await launch();
 const ctx = await b.newContext({ acceptDownloads: true, reducedMotion: "reduce" });
 const errs = [];
 const p = await ctx.newPage(); watch(p, "PANEL", errs);
-await p.goto(fileUrl(PANEL)); await p.waitForTimeout(300);
+await openPanel(p);
 check(/^v\d/.test(await p.textContent("#footMeta")), "sürüm alt bilgide görünüyor");
 
 for(const tax of ["uct", "nist"]){
@@ -23,7 +23,7 @@ for(const tax of ["uct", "nist"]){
   check(/^\d{8}$/.test(r.password), `${tax}: 8 haneli açma şifresi üretildi`);
   await s.close();
 
-  await p.evaluate(() => switchTab("load"));
+  await p.evaluate(() => switchTab("hub"));
   await p.setInputFiles("#fileInput", r.file);
   await p.fill("#pwInput", "00000000"); await p.click("#btnDecrypt"); await p.waitForTimeout(400);
   check(/yanlış/i.test(await p.textContent("#decryptErr")), `${tax}: yanlış şifre reddedildi`);
