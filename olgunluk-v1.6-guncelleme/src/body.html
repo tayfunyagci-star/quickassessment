@@ -1,0 +1,238 @@
+
+<div class="app-version" id="appVersionBadge">v1.4</div>
+
+<!-- Resume prompt -->
+<div id="resumeModal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <h2>Devam eden bir değerlendirme var</h2>
+    <p id="resumeText">Yarım kalmış bir değerlendirmeniz bulundu. Kaldığınız yerden devam etmek ister misiniz?</p>
+    <div class="modal-actions">
+      <button class="btn-nav" id="btnResumeFresh">Yeniden Başla</button>
+      <button class="btn-nav primary" id="btnResumeContinue">Devam Et</button>
+    </div>
+  </div>
+</div>
+
+<section id="landing" class="screen">
+  <header class="ust">
+    <div class="ust-ic">
+      <div class="marka"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.8l7.5 3.1v5.6c0 4.8-3.2 8.3-7.5 9.9-4.3-1.6-7.5-5.1-7.5-9.9V5.9L12 2.8z"/><path d="M8.6 12.2l2.3 2.3 4.6-4.8"/></svg>
+        <div class="marka-yazi"><span class="marka-ad">Hızlı Olgunluk Değerlendirmesi</span><span class="marka-alt" id="markaAlt">Siber Güvenlik Olgunluk Anketi</span></div>
+      </div>
+      <div class="ust-sag">
+        <button class="tema-dugme" id="themeToggle" title="Aydınlık / karanlık tema" aria-label="Temayı değiştir">
+          <svg class="simge-ay" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg>
+          <svg class="simge-gunes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v2.5M12 19v2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M2.5 12H5M19 12h2.5M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+  <div class="govde">
+    <div class="landing-hero" data-client>
+      <div class="eyebrow" id="landingEyebrow">Hızlı Değerlendirme</div>
+      <h1 class="landing-title">Kurumunuzun siber güvenlik <em>olgunluğunu</em> bugün ölçün.</h1>
+      <p class="landing-sub" id="landingSubClient">Bu anket, kurumunuzun siber güvenlik olgunluğunu hızlıca değerlendirmek üzere hazırlanmıştır.</p>
+      <div class="domain-matrix-section" id="clientInfoPanels">
+    <div class="domain-matrix-title">Nasıl Çalışır?</div>
+    <div class="domain-matrix info-panels-grid">
+      <div class="domain-card">
+        <div class="domain-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg></div>
+        <div class="domain-card-body">
+          <div class="domain-card-name"><span class="js-qcount">30</span> Soru, 3 Boyut</div>
+          <div class="domain-card-desc">İnsan, Süreç ve Teknoloji boyutlarında kurumunuzu bugün en iyi tanımlayan ifadeleri seçerek yanıtlayın. Tahmini süre ~15 dakika.</div>
+        </div>
+      </div>
+      <div class="domain-card">
+        <div class="domain-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></div>
+        <div class="domain-card-body">
+          <div class="domain-card-name">Uçtan Uca Şifreleme</div>
+          <div class="domain-card-desc">Yanıtlarınız cihazınızda <b>AES-256</b> algoritmasıyla şifrelenir. Kurumunuza ait bilgiler şifreli iletilir ve güvenli şekilde işlenir.</div>
+        </div>
+      </div>
+      <div class="domain-card">
+        <div class="domain-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M4 17v3a2 2 0 002 2h12a2 2 0 002-2v-3"/></svg></div>
+        <div class="domain-card-body">
+          <div class="domain-card-name">Gönderime Hazır Dosya</div>
+          <div class="domain-card-desc">Değerlendirmeyi tamamladığınızda, gönderime hazır şifreli bir dosya bilgisayarınıza otomatik olarak iner.</div>
+        </div>
+      </div>
+      <div class="domain-card">
+        <div class="domain-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v6M12 9l-6 6M12 9l6 6"/><circle cx="6" cy="18" r="2.3"/><circle cx="18" cy="18" r="2.3"/></svg></div>
+        <div class="domain-card-body">
+          <div class="domain-card-name">Şifreyi Ayrı Gönderin</div>
+          <div class="domain-card-desc">Ekranda göreceğiniz 8 haneli şifreyi dosyayla <b>aynı kanaldan değil</b>, ayrı ve güvenli bir kanaldan (telefon, SMS vb.) iletin.</div>
+        </div>
+      </div>
+      <div class="domain-card">
+        <div class="domain-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+        <div class="domain-card-body">
+          <div class="domain-card-name">İstediğiniz Zaman Düzenleyin</div>
+          <div class="domain-card-desc">Tamamladıktan sonra da geri dönüp yanıtlarınızı değiştirebilir, dosyayı yeniden indirebilirsiniz.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+      <div class="landing-meta">
+        <div class="landing-meta-item"><div class="landing-meta-num" id="metaDomains">11</div><div class="landing-meta-label">Kontrol alanı</div></div>
+        <div class="landing-meta-item"><div class="landing-meta-num" id="metaQuestions">30</div><div class="landing-meta-label">Soru</div></div>
+        <div class="landing-meta-item"><div class="landing-meta-num">~15dk</div><div class="landing-meta-label">Tahmini süre</div></div>
+      </div>
+      <input type="text" class="org-input" id="orgNameInput" placeholder="Kurum adı (opsiyonel)">
+      <div class="landing-actions">
+        <button class="btn-start" id="btnStart">
+          Değerlendirmeye Başla
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div id="toolHub" data-full>
+      <div class="kirinti">Dahili araçlar</div>
+      <h1>Değerlendirme Merkezi</h1>
+      <p class="aciklama">Müşteriden dönen şifreli cevap dosyasını değerlendirin, soru setini yönetin ve müşteriye gönderilecek anket modülünü üretin.</p>
+      <div class="olcuts" id="hubMetrics"></div>
+      <div class="arac-izgara">
+        <div class="kart genis-kart">
+          <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8l-5-5z"/><path d="M14 3v5h5M9 14l2 2 4-4"/></svg>Anket Değerlendirme</h2>
+          <p class="aciklama">Müşteriden gelen şifreli cevap dosyasını (<span class="tekgen">.json</span>) yükleyin. Dosya şifresi sorulur; sonuçlar, uyumsuzluk notları ve Word raporu bu dosyadan üretilir.</p>
+          <div class="birak-alani" id="dropZone" role="button" tabindex="0" aria-label="Cevap dosyasını sürükleyip bırakın veya seçmek için tıklayın">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M12 4l-4.5 4.5M12 4l4.5 4.5"/><path d="M4 15v3.5A1.5 1.5 0 005.5 20h13a1.5 1.5 0 001.5-1.5V15"/></svg>
+            <div class="birak-baslik">Cevap dosyasını buraya sürükleyip bırakın</div>
+            <div class="birak-veya">veya</div>
+            <button class="btn-nav primary" id="btnLoadSubmission" type="button">Dosya Seç</button>
+            <div class="birak-alt">Şifreli cevap dosyası · .json</div>
+          </div>
+          <input type="file" id="submissionFileInput" accept=".json,application/json" class="hidden">
+        </div>
+        <div class="kart">
+          <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg>Soru Yönetimi</h2>
+          <p class="aciklama">Soruları, olgunluk ifadelerini, etki seviyelerini ve mevzuat eşlemelerini düzenleyin; Excel veya JSON ile içe/dışa aktarın. Yönetici girişi gerekir.</p>
+          <div class="kart-dugmeler"><button class="btn-nav" id="btnGoAdmin" type="button">Soru Yönetimine Git</button></div>
+        </div>
+        <div class="kart">
+          <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M4 17v3a2 2 0 002 2h12a2 2 0 002-2v-3"/></svg>Anket Üretimi</h2>
+          <p class="aciklama">Güncel soru setiyle müşteriye gönderilecek bağımsız anket dosyasını (HTML) üretin. Dosya yalnızca anketi içerir; yönetim, puanlama ve mevzuat eşlemesi taşımaz. Yönetici girişi gerekir.</p>
+          <div class="kart-dugmeler"><button class="btn-nav" id="btnHubExport" type="button">Müşteri Anketini Oluştur</button></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="domain-matrix-section">
+      <div class="domain-matrix-title">Değerlendirme kapsamındaki kontrol alanları</div>
+      <div class="domain-matrix" id="domainCloud"></div>
+    </div>
+  </div>
+</section>
+
+<section id="assessment" class="screen hidden">
+  <div class="topbar">
+    <div class="topbar-left-group">
+      <button class="btn-home" id="btnGoHome" title="Ana sayfaya dön">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 11.5L12 4l8 7.5M6 9.5V20h12V9.5"/></svg>
+      </button>
+      <div class="topbar-title">
+        Hızlı Olgunluk Değerlendirmesi
+        <span class="save-indicator" id="saveIndicator">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
+          Kaydedildi
+        </span>
+      </div>
+    </div>
+    <div class="topbar-right-group">
+      <div class="dots-row" id="stepDots"></div>
+      <button class="btn-home" id="btnToggleFilter" title="Soruları filtrele">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="filter-panel hidden" id="filterPanel"></div>
+  <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+
+  <div class="q-card" id="qCard"></div>
+
+  <div class="nav-row">
+    <button class="btn-nav" id="btnPrev">← Önceki</button>
+    <button class="btn-nav primary" id="btnNext">Sonraki →</button>
+  </div>
+</section>
+
+<section id="results" class="screen hidden" data-full>
+  <div class="results-wrap" id="resultsWrap"></div>
+</section>
+
+<section id="demoResults" class="screen hidden" data-full>
+  <div class="results-wrap" id="demoResultsWrap"></div>
+</section>
+
+<section id="clientDone" class="screen hidden">
+  <div class="client-done-wrap">
+    <div class="client-done-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+    </div>
+    <h1>Değerlendirme Tamamlandı</h1>
+    <p>Yanıtlarınızı içeren, <b>şifrelenmiş ve gönderime hazır</b> bir dosya bilgisayarınıza indirildi. Analiz sonuçlarınızı görebilmemiz için lütfen bu dosyayı bizimle paylaşın.</p>
+    <div class="password-box">
+      <div class="password-box-label">Dosya Şifresi</div>
+      <div class="password-box-value" id="submissionPasswordValue">—</div>
+      <div class="password-box-warn">Bu şifreyi dosyayla <b>aynı kanaldan göndermeyin</b>. Dosyayı e-posta ile gönderdikten sonra bu şifreyi telefon, SMS veya ayrı bir mesajla — yani farklı, güvenli bir kanaldan — iletin.</div>
+    </div>
+    <div class="client-done-actions">
+      <button class="btn-nav primary" id="btnRedownloadSubmission">Dosyayı Tekrar İndir</button>
+      <button class="btn-nav" id="btnEditAnswers">Cevapları Düzenle</button>
+    </div>
+    <button class="client-done-restart" id="btnClientRestart">Yeniden Başlat</button>
+  </div>
+</section>
+
+<section id="answerDetails" class="screen hidden" data-full>
+  <div class="results-wrap" id="answerDetailsWrap"></div>
+</section>
+
+<div id="passwordModal" class="modal-overlay hidden" data-full>
+  <div class="modal-box">
+    <h2>Dosya Şifreli</h2>
+    <p>Bu değerlendirme dosyası şifrelenmiş. Devam etmek için kurumdan size ayrı bir kanaldan iletilen 8 haneli şifreyi girin.</p>
+    <div class="gate-err" id="passwordModalErr"></div>
+    <input type="text" id="passwordModalInput" class="org-input" placeholder="8 haneli şifre" style="text-align:center;letter-spacing:.1em;max-width:200px;margin:0 auto 16px;">
+    <div class="modal-actions">
+      <button class="btn-nav" id="passwordModalCancel">İptal</button>
+      <button class="btn-nav primary" id="passwordModalOk">Devam Et</button>
+    </div>
+  </div>
+</div>
+
+<section id="adminGate" class="screen hidden" data-full>
+  <div class="gate-box">
+    <h2 style="font-size:18px;margin-bottom:8px;">Yönetici Girişi</h2>
+    <p style="color:var(--text-faint);font-size:12.5px;margin-bottom:4px;" id="gateHint">Bu alan yalnızca içerik yönetimi içindir.</p>
+    <div class="gate-err" id="gateErr"></div>
+    <input type="password" id="adminPassInput" placeholder="Parola" autocomplete="current-password">
+    <input type="text" id="adminOtpInput" class="otp-input hidden" placeholder="Doğrulama kodu (6 hane)" inputmode="numeric" autocomplete="one-time-code" maxlength="7">
+    <button class="btn-nav primary" id="btnAdminLogin" style="width:100%">Giriş Yap</button>
+    <button class="client-done-restart" id="btnAdminGateBack" style="margin-top:14px;">Ana sayfaya dön</button>
+  </div>
+</section>
+
+<section id="admin" class="screen hidden" data-full>
+  <div class="admin-topbar">
+    <h1>Soru Yönetimi</h1>
+    <div class="admin-actions">
+      <button class="btn-sm" id="btnAdminAddNew">+ Yeni Soru</button>
+      <button class="btn-sm" id="btnAdminExport">JSON Dışa Aktar</button>
+      <button class="btn-sm" id="btnAdminImport">JSON İçe Aktar</button>
+      <input type="file" id="adminImportFile" accept=".json" style="display:none">
+      <button class="btn-sm" id="btnAdminExportXlsx">Excel Dışa Aktar</button>
+      <button class="btn-sm" id="btnAdminImportXlsx">Excel İçe Aktar</button>
+      <input type="file" id="adminImportXlsxFile" accept=".xlsx" style="display:none">
+      <button class="btn-sm danger" id="btnAdminReset">Varsayılana Sıfırla</button>
+      <button class="btn-sm" id="btnAdmin2fa">İki Adımlı Doğrulama</button>
+      <button class="btn-sm primary" id="btnAdminExportHtml">Müşteri Modülü (HTML) Oluştur</button>
+      <a href="#" class="btn-sm" id="btnAdminExit" style="text-decoration:none;display:inline-flex;align-items:center;">Uygulamaya Dön</a>
+      <button class="btn-sm" id="btnAdminLogout">Oturumu Kapat</button>
+    </div>
+  </div>
+  <div class="info-banner hidden" id="admin2faBanner"></div>
+  <div id="adminList"></div>
+  <div id="adminFormHolder"></div>
+</section>
+

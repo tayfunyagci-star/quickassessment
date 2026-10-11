@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<title>Kimlik Doğrulayıcı</title>
+<style>
+:root{
+  --bg:#f3f5f8; --panel:#ffffff; --raised:#f8f9fb; --raised2:#eef1f5;
+  --border:#dde2e8; --text:#1a2230; --text-dim:#4d5867; --text-faint:#8b93a1;
+  --accent:#0d9488; --accent-ink:#ffffff; --danger:#c0334a; --warn:#e07b2e;
+  --font:"Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:"SF Mono",Consolas,"Roboto Mono",monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#101019; --panel:#171724; --raised:#1e1e2e; --raised2:#262638;
+    --border:#2c2c40; --text:#eef0f7; --text-dim:#b0b0c8; --text-faint:#6d6d89;
+    --accent:#2dd4bf; --accent-ink:#08201c; --danger:#e5566d; --warn:#e8843d;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#101019; --panel:#171724; --raised:#1e1e2e; --raised2:#262638;
+  --border:#2c2c40; --text:#eef0f7; --text-dim:#b0b0c8; --text-faint:#6d6d89;
+  --accent:#2dd4bf; --accent-ink:#08201c; --danger:#e5566d; --warn:#e8843d;
+}
+*{ box-sizing:border-box; }
+html,body{ margin:0; background:var(--bg); color:var(--text); font-family:var(--font); font-size:15px; line-height:1.5; }
+.hidden{ display:none !important; }
+button{ font-family:inherit; cursor:pointer; }
+.screen{ min-height:100vh; padding:24px 16px 60px; }
+#scrSetup,#scrLock{ display:flex; align-items:center; justify-content:center; }
+.card{ background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:26px; width:100%; max-width:520px; }
+.card.narrow{ max-width:400px; text-align:center; }
+.card.narrow label, .card.narrow .err{ text-align:left; }
+.logo{ width:54px; height:54px; border-radius:14px; background:color-mix(in srgb, var(--accent) 14%, transparent); color:var(--accent); display:flex; align-items:center; justify-content:center; margin:0 auto 14px; }
+.logo svg{ width:28px; height:28px; }
+h1{ font-size:21px; margin:0 0 8px; } h2{ font-size:18px; margin:0 0 14px; }
+.sub{ color:var(--text-dim); font-size:13.5px; margin:0 0 18px; }
+.note{ color:var(--text-faint); font-size:12px; margin:14px 0 0; text-align:left; }
+label{ display:block; font-size:12px; font-weight:600; color:var(--text-faint); margin:10px 0 5px; }
+input[type=text],input[type=password],input[type=search],textarea,select{ width:100%; padding:10px 12px; border-radius:9px; border:1px solid var(--border); background:var(--raised); color:var(--text); font-size:14px; font-family:inherit; }
+textarea{ resize:vertical; font-family:var(--mono); font-size:12.5px; }
+.mono{ font-family:var(--mono); letter-spacing:.05em; }
+.err{ color:var(--danger); font-size:12.5px; min-height:18px; margin:8px 0; }
+.btn{ padding:10px 18px; border-radius:9px; border:1px solid var(--border); background:var(--raised); color:var(--text); font-weight:600; font-size:13.5px; }
+.btn:hover{ background:var(--raised2); }
+.btn.primary{ background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
+.btn.danger{ color:var(--danger); border-color:color-mix(in srgb, var(--danger) 45%, transparent); }
+.btn.sm{ padding:7px 12px; font-size:12.5px; }
+.btn.wide{ width:100%; margin-top:6px; }
+.link{ background:none; border:none; color:var(--text-faint); text-decoration:underline; font-size:12.5px; margin-top:12px; }
+.topbar{ max-width:640px; margin:0 auto 6px; display:flex; align-items:center; justify-content:space-between; }
+.brand{ display:flex; align-items:center; gap:10px; font-weight:700; font-size:17px; }
+.brand svg{ width:24px; height:24px; color:var(--accent); }
+.actions{ display:flex; gap:8px; }
+.icon{ width:38px; height:38px; border-radius:10px; border:1px solid var(--border); background:var(--raised); color:var(--text-dim); display:flex; align-items:center; justify-content:center; }
+.icon:hover{ background:var(--raised2); color:var(--text); }
+.icon svg{ width:18px; height:18px; }
+.clock{ max-width:640px; margin:0 auto 14px; color:var(--text-faint); font-size:12px; font-family:var(--mono); }
+.search{ display:block; max-width:640px; margin:0 auto 14px; }
+.list{ max-width:640px; margin:0 auto; display:flex; flex-direction:column; gap:10px; }
+.acct{ background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:16px 18px; display:flex; align-items:center; gap:16px; }
+.acct-main{ flex:1; min-width:0; }
+.acct-issuer{ font-weight:700; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.acct-name{ color:var(--text-faint); font-size:12.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.acct-code{ font-family:var(--mono); font-size:30px; font-weight:700; letter-spacing:.08em; color:var(--accent); margin-top:4px; cursor:pointer; user-select:all; background:none; border:none; padding:0; text-align:left; }
+.acct-code.warn{ color:var(--warn); }
+.acct-code.masked{ color:var(--text-faint); }
+.acct-side{ display:flex; flex-direction:column; align-items:center; gap:8px; }
+.ring{ width:40px; height:40px; position:relative; }
+.ring svg{ width:40px; height:40px; transform:rotate(-90deg); }
+.ring span{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-size:11.5px; font-weight:700; color:var(--text-dim); }
+.mini{ display:flex; gap:4px; }
+.mini button{ width:30px; height:30px; border-radius:8px; border:1px solid var(--border); background:var(--raised); color:var(--text-dim); display:flex; align-items:center; justify-content:center; }
+.mini button:hover{ color:var(--text); background:var(--raised2); }
+.mini svg{ width:14px; height:14px; }
+.empty{ max-width:640px; margin:40px auto; text-align:center; color:var(--text-faint); }
+.modal{ position:fixed; inset:0; background:rgba(6,6,10,.6); display:flex; align-items:center; justify-content:center; padding:16px; z-index:50; }
+.modal .card{ max-height:calc(100vh - 32px); overflow:auto; }
+.tabs{ display:flex; gap:6px; margin-bottom:6px; }
+.tab{ border:1px solid var(--border); background:var(--raised); color:var(--text-dim); font-size:12.5px; font-weight:600; padding:6px 12px; border-radius:14px; }
+.tab.active{ background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
+.row3{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.preview{ font-family:var(--mono); font-size:13px; color:var(--text-dim); margin-top:10px; min-height:18px; }
+.dlg-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:12px; }
+.set-row{ display:flex; align-items:center; justify-content:space-between; gap:14px; padding:12px 0; border-top:1px solid var(--border); }
+.set-row:first-of-type{ border-top:none; }
+.set-row span{ display:block; color:var(--text-faint); font-size:12px; }
+.set-row select{ width:auto; }
+.set-row .btns{ display:flex; gap:6px; }
+#chgPwBox{ padding:0 0 12px; }
+.toast{ position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(20px); background:var(--text); color:var(--bg); font-size:13px; font-weight:600; padding:9px 16px; border-radius:20px; opacity:0; transition:all .2s; pointer-events:none; z-index:60; }
+.toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+.app-version{ position:fixed; bottom:12px; right:14px; font-family:var(--mono); font-size:10.5px; font-weight:700; color:var(--text-faint); background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:3px 10px; z-index:40; }
+@media (max-width:480px){ .acct-code{ font-size:25px; } .row3{ grid-template-columns:1fr 1fr; } }
+
+</style>
+</head>
+<body>
+<div class="app-version" id="ver">v1.0</div>
+
+<!-- Kurulum -->
+<section id="scrSetup" class="screen hidden">
+  <div class="card narrow">
+    <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><circle cx="12" cy="11" r="2.2"/><path d="M12 13.2V16"/></svg></div>
+    <h1>Kimlik Doğrulayıcı</h1>
+    <p class="sub">Tek kullanımlık doğrulama kodları (TOTP) üretir. Hesaplarınız bu tarayıcıda, belirleyeceğiniz ana parolayla <b>AES-256</b> şifrelenmiş olarak saklanır.</p>
+    <label>Ana parola (en az 8 karakter)</label>
+    <input type="password" id="setupPw" autocomplete="new-password">
+    <label>Ana parola (tekrar)</label>
+    <input type="password" id="setupPw2" autocomplete="new-password">
+    <div class="err" id="setupErr"></div>
+    <button class="btn primary wide" id="btnSetup">Kasayı Oluştur</button>
+    <p class="note">Ana parola unutulursa kasa açılamaz; kodları yeniden üretmek için hesapları tekrar eklemeniz gerekir. Yedek almanız önerilir.</p>
+    <button class="link" id="btnSetupImport">Yedekten geri yükle</button>
+  </div>
+</section>
+
+<!-- Kilit -->
+<section id="scrLock" class="screen hidden">
+  <div class="card narrow">
+    <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></div>
+    <h1>Kasa Kilitli</h1>
+    <p class="sub">Kodları görmek için ana parolanızı girin.</p>
+    <input type="password" id="lockPw" autocomplete="current-password" placeholder="Ana parola">
+    <div class="err" id="lockErr"></div>
+    <button class="btn primary wide" id="btnUnlock">Kilidi Aç</button>
+  </div>
+</section>
+
+<!-- Ana ekran -->
+<section id="scrMain" class="screen hidden">
+  <header class="topbar">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><circle cx="12" cy="11" r="2.2"/><path d="M12 13.2V16"/></svg>
+      <span>Kimlik Doğrulayıcı</span>
+    </div>
+    <div class="actions">
+      <button class="icon" id="btnAdd" title="Hesap ekle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+      <button class="icon" id="btnSettings" title="Ayarlar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg></button>
+      <button class="icon" id="btnTheme" title="Tema"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg></button>
+      <button class="icon" id="btnLock" title="Kilitle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></button>
+    </div>
+  </header>
+  <div class="clock" id="clock"></div>
+  <input type="search" id="search" class="search hidden" placeholder="Hesap ara">
+  <div id="list" class="list"></div>
+  <div id="empty" class="empty hidden">
+    <p>Henüz hesap yok.</p>
+    <button class="btn primary" id="btnAddEmpty">Hesap Ekle</button>
+  </div>
+</section>
+
+<!-- Hesap ekle / düzenle -->
+<div id="dlgAdd" class="modal hidden">
+  <div class="card">
+    <h2 id="addTitle">Hesap Ekle</h2>
+    <div class="tabs">
+      <button class="tab active" data-tab="uri">Bağlantı ile</button>
+      <button class="tab" data-tab="manual">Elle</button>
+    </div>
+    <div data-pane="uri">
+      <label>otpauth:// bağlantısı</label>
+      <textarea id="addUri" rows="3" placeholder="otpauth://totp/Kurum:hesap?secret=...&issuer=..."></textarea>
+    </div>
+    <div data-pane="manual" class="hidden">
+      <label>Hizmet / kurum</label><input type="text" id="addIssuer" placeholder="ör. Olgunluk Değerlendirme">
+      <label>Hesap</label><input type="text" id="addAccount" placeholder="ör. Yönetici">
+      <label>Gizli anahtar (Base32)</label><input type="text" id="addSecret" class="mono" placeholder="ABCD EFGH ...">
+      <div class="row3">
+        <div><label>Hane</label><select id="addDigits"><option>6</option><option>8</option></select></div>
+        <div><label>Süre (sn)</label><select id="addPeriod"><option>30</option><option>60</option></select></div>
+        <div><label>Algoritma</label><select id="addAlg"><option>SHA1</option><option>SHA256</option><option>SHA512</option></select></div>
+      </div>
+    </div>
+    <div class="preview" id="addPreview"></div>
+    <div class="err" id="addErr"></div>
+    <div class="dlg-actions">
+      <button class="btn" id="btnAddCancel">Vazgeç</button>
+      <button class="btn primary" id="btnAddSave">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- Ayarlar -->
+<div id="dlgSettings" class="modal hidden">
+  <div class="card">
+    <h2>Ayarlar</h2>
+    <div class="set-row">
+      <div><b>Otomatik kilit</b><span>Hareketsizlik süresi sonunda kasa kilitlenir.</span></div>
+      <select id="setAutolock"><option value="1">1 dk</option><option value="5">5 dk</option><option value="15">15 dk</option><option value="0">Kapalı</option></select>
+    </div>
+    <div class="set-row">
+      <div><b>Kodları gizle</b><span>Kodlar yalnızca üzerine tıklayınca görünür.</span></div>
+      <input type="checkbox" id="setHide">
+    </div>
+    <div class="set-row">
+      <div><b>Şifreli yedek</b><span>Hesapları ana parolayla şifreli bir dosyaya aktarır / geri yükler.</span></div>
+      <div class="btns"><button class="btn sm" id="btnExport">Dışa Aktar</button><button class="btn sm" id="btnImport">İçe Aktar</button></div>
+    </div>
+    <div class="set-row">
+      <div><b>Ana parolayı değiştir</b><span>Kasa yeni parolayla yeniden şifrelenir.</span></div>
+      <button class="btn sm" id="btnChangePw">Değiştir</button>
+    </div>
+    <div id="chgPwBox" class="hidden">
+      <label>Mevcut parola</label><input type="password" id="chgOld">
+      <label>Yeni parola (en az 8 karakter)</label><input type="password" id="chgNew">
+      <label>Yeni parola (tekrar)</label><input type="password" id="chgNew2">
+      <div class="err" id="chgErr"></div>
+      <button class="btn primary sm" id="btnChgSave">Parolayı Güncelle</button>
+    </div>
+    <div class="set-row">
+      <div><b>Tüm verileri sil</b><span>Kasayı bu tarayıcıdan kalıcı olarak siler.</span></div>
+      <button class="btn sm danger" id="btnWipe">Sil</button>
+    </div>
+    <p class="note" id="setVersion"></p>
+    <div class="dlg-actions"><button class="btn primary" id="btnSettingsClose">Kapat</button></div>
+  </div>
+</div>
+
+<input type="file" id="fileImport" accept=".json" class="hidden">
+<div id="toast" class="toast"></div>
+
+<script>
+/* TOTP (RFC 6238) / HOTP (RFC 4226) — WebCrypto tabanlı, harici bağımlılık yok.
+   Google/Microsoft Authenticator ile uyumlu: Base32 gizli anahtar, SHA-1, 6 hane, 30 sn. */
+(function(root){
+"use strict";
+const B32 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+function base32Decode(str){
+  const s = String(str || "").toUpperCase().replace(/[\s-]/g, "").replace(/=+$/, "");
+  if(!s || /[^A-Z2-7]/.test(s)) throw new Error("Geçersiz Base32 anahtar");
+  let bits = 0, val = 0; const out = [];
+  for(const ch of s){
+    val = (val << 5) | B32.indexOf(ch); bits += 5;
+    if(bits >= 8){ out.push((val >>> (bits - 8)) & 255); bits -= 8; }
+  }
+  return new Uint8Array(out);
+}
+function base32Encode(bytes){
+  let bits = 0, val = 0, out = "";
+  for(const b of bytes){
+    val = (val << 8) | b; bits += 8;
+    while(bits >= 5){ out += B32[(val >>> (bits - 5)) & 31]; bits -= 5; }
+  }
+  if(bits > 0) out += B32[(val << (5 - bits)) & 31];
+  return out;
+}
+function randomSecret(nBytes){ return base32Encode(crypto.getRandomValues(new Uint8Array(nBytes || 20))); }
+const ALG = { SHA1:"SHA-1", "SHA-1":"SHA-1", SHA256:"SHA-256", "SHA-256":"SHA-256", SHA512:"SHA-512", "SHA-512":"SHA-512" };
+async function hotp(keyBytes, counter, digits, algorithm){
+  digits = digits || 6;
+  const key = await crypto.subtle.importKey("raw", keyBytes, { name:"HMAC", hash: ALG[algorithm || "SHA1"] || "SHA-1" }, false, ["sign"]);
+  const msg = new Uint8Array(8); let c = counter;
+  for(let i = 7; i >= 0; i--){ msg[i] = c & 255; c = Math.floor(c / 256); }
+  const h = new Uint8Array(await crypto.subtle.sign("HMAC", key, msg));
+  const off = h[h.length - 1] & 15;
+  const bin = ((h[off] & 127) << 24) | (h[off+1] << 16) | (h[off+2] << 8) | h[off+3];
+  return String(bin % Math.pow(10, digits)).padStart(digits, "0");
+}
+function stepAt(timeMs, period){ return Math.floor((timeMs == null ? Date.now() : timeMs) / 1000 / (period || 30)); }
+async function totp(secretB32, opts){
+  opts = opts || {};
+  return hotp(base32Decode(secretB32), stepAt(opts.time, opts.period), opts.digits, opts.algorithm);
+}
+/* Doğrulama: ±window adım tolerans. Eşleşen adımı döndürür (tekrar kullanım kontrolü için), yoksa null. */
+async function verify(secretB32, code, opts){
+  opts = opts || {};
+  const c = String(code || "").replace(/\s/g, "");
+  const digits = opts.digits || 6;
+  if(!new RegExp(`^\\d{${digits}}$`).test(c)) return null;
+  const key = base32Decode(secretB32), now = stepAt(opts.time, opts.period), w = opts.window == null ? 1 : opts.window;
+  for(let d = -w; d <= w; d++){
+    if(await hotp(key, now + d, digits, opts.algorithm) === c) return now + d;
+  }
+  return null;
+}
+function parseOtpauth(uri){
+  const u = new URL(uri.trim());
+  if(u.protocol !== "otpauth:") throw new Error("otpauth:// bağlantısı bekleniyor");
+  if(u.host.toLowerCase() !== "totp") throw new Error("Yalnızca TOTP desteklenir");
+  const label = decodeURIComponent(u.pathname.replace(/^\//, ""));
+  const p = u.searchParams;
+  let issuer = p.get("issuer") || "", account = label;
+  if(label.includes(":")){ const i = label.indexOf(":"); issuer = issuer || label.slice(0, i); account = label.slice(i + 1); }
+  const secret = (p.get("secret") || "").toUpperCase().replace(/\s/g, "");
+  base32Decode(secret);
+  return { issuer: issuer.trim(), account: account.trim(), secret,
+    digits: parseInt(p.get("digits") || "6", 10), period: parseInt(p.get("period") || "30", 10),
+    algorithm: (p.get("algorithm") || "SHA1").toUpperCase().replace("-", "") };
+}
+function buildOtpauth(o){
+  const label = encodeURIComponent(`${o.issuer}:${o.account}`);
+  const q = new URLSearchParams({ secret:o.secret, issuer:o.issuer, algorithm:o.algorithm || "SHA1", digits:String(o.digits || 6), period:String(o.period || 30) });
+  return `otpauth://totp/${label}?${q.toString()}`;
+}
+/* Parola tabanlı şifreleme (PBKDF2-SHA256 → AES-256-GCM) */
+function b64(buf){ let s = ""; new Uint8Array(buf).forEach(b => s += String.fromCharCode(b)); return btoa(s); }
+function unb64(str){ const s = atob(str); const a = new Uint8Array(s.length); for(let i = 0; i < s.length; i++) a[i] = s.charCodeAt(i); return a; }
+async function pwKey(password, salt, iter){
+  const km = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveKey"]);
+  return crypto.subtle.deriveKey({ name:"PBKDF2", salt, iterations: iter, hash:"SHA-256" }, km, { name:"AES-GCM", length:256 }, false, ["encrypt","decrypt"]);
+}
+async function sealText(text, password, iter){
+  iter = iter || 250000;
+  const salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = await crypto.subtle.encrypt({ name:"AES-GCM", iv }, await pwKey(password, salt, iter), new TextEncoder().encode(text));
+  return { v:1, kdf:"PBKDF2-SHA256", iter, salt:b64(salt), iv:b64(iv), ct:b64(ct) };
+}
+async function openText(box, password){
+  try{
+    const pt = await crypto.subtle.decrypt({ name:"AES-GCM", iv:unb64(box.iv) }, await pwKey(password, unb64(box.salt), box.iter || 250000), unb64(box.ct));
+    return new TextDecoder().decode(pt);
+  }catch(e){ throw new Error("Parola hatalı veya veri bozuk"); }
+}
+root.QA_TOTP = { base32Decode, base32Encode, randomSecret, hotp, totp, verify, stepAt, parseOtpauth, buildOtpauth, sealText, openText };
+})(typeof window !== "undefined" ? window : globalThis);
+
+</script>
+<script>
+(function(){
+"use strict";
+/* =========================================================
+   KİMLİK DOĞRULAYICI — TOTP kod üreteci
+   Hesaplar ana parolayla (PBKDF2-SHA256 250k → AES-256-GCM)
+   şifrelenip yalnızca bu tarayıcıda saklanır; açık hâli bellekte.
+========================================================= */
+const APP_VERSION = "1.0";
+const APP_CHANGELOG = [
+  { v:"1.0", date:"2026-10-02", notes:"İlk sürüm: TOTP (RFC 6238) kod üretimi, otpauth bağlantısı veya elle hesap ekleme, şifreli kasa, otomatik kilit, şifreli yedek." },
+];
+const T = window.QA_TOTP;
+const LS_VAULT = "qa_authenticator_vault_v1", LS_PREFS = "qa_authenticator_prefs_v1";
+
+let master = null;     // açık oturumda ana parola (yalnızca bellek)
+let accounts = [];     // [{id, issuer, account, secret, digits, period, algorithm, added}]
+let prefs = { autolock:5, hide:false, theme:null };
+let lastActivity = Date.now();
+let revealed = new Set();
+let tickTimer = null;
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function toast(msg){ const t = $("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toast._t); toast._t = setTimeout(()=> t.classList.remove("show"), 1600); }
+function show(id){ ["scrSetup","scrLock","scrMain"].forEach(s => $(s).classList.toggle("hidden", s !== id)); }
+function loadPrefs(){ try{ Object.assign(prefs, JSON.parse(localStorage.getItem(LS_PREFS) || "{}")); }catch(e){} }
+function savePrefs(){ try{ localStorage.setItem(LS_PREFS, JSON.stringify(prefs)); }catch(e){} }
+function readVault(){ try{ return JSON.parse(localStorage.getItem(LS_VAULT) || "null"); }catch(e){ return null; } }
+async function persist(){
+  const box = await T.sealText(JSON.stringify({ accounts }), master);
+  localStorage.setItem(LS_VAULT, JSON.stringify(box));
+}
+function applyTheme(){ if(prefs.theme) document.documentElement.setAttribute("data-theme", prefs.theme); else document.documentElement.removeAttribute("data-theme"); }
+
+/* ---------------- Kurulum / kilit ---------------- */
+async function doSetup(){
+  const a = $("setupPw").value, b = $("setupPw2").value;
+  if(a.length < 8){ $("setupErr").textContent = "Ana parola en az 8 karakter olmalı."; return; }
+  if(a !== b){ $("setupErr").textContent = "Parolalar eşleşmiyor."; return; }
+  master = a; accounts = [];
+  $("btnSetup").disabled = true;
+  await persist();
+  $("setupPw").value = $("setupPw2").value = "";
+  $("btnSetup").disabled = false;
+  enterMain();
+}
+async function doUnlock(){
+  const pw = $("lockPw").value; $("lockErr").textContent = "";
+  $("btnUnlock").disabled = true;
+  try{
+    const data = JSON.parse(await T.openText(readVault(), pw));
+    master = pw; accounts = data.accounts || [];
+    $("lockPw").value = "";
+    enterMain();
+  }catch(e){ $("lockErr").textContent = "Ana parola hatalı."; }
+  finally{ $("btnUnlock").disabled = false; }
+}
+function lock(){
+  master = null; accounts = []; revealed.clear();
+  clearInterval(tickTimer); tickTimer = null;
+  $("list").innerHTML = "";
+  ["dlgAdd","dlgSettings"].forEach(d => $(d).classList.add("hidden"));
+  show("scrLock");
+  setTimeout(()=> $("lockPw").focus(), 50);
+}
+function enterMain(){
+  show("scrMain");
+  lastActivity = Date.now();
+  renderList();
+  clearInterval(tickTimer);
+  tickTimer = setInterval(tick, 1000);
+  tick();
+}
+
+/* ---------------- Liste ve kodlar ---------------- */
+const ICON_COPY = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 012-2h10"/></svg>';
+const ICON_EDIT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>';
+const ICON_DEL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>';
+
+function renderList(){
+  const q = ($("search").value || "").toLocaleLowerCase("tr-TR");
+  $("search").classList.toggle("hidden", accounts.length < 5);
+  $("empty").classList.toggle("hidden", accounts.length > 0);
+  const items = accounts.filter(a => !q || (a.issuer + " " + a.account).toLocaleLowerCase("tr-TR").includes(q));
+  $("list").innerHTML = items.map(a => `
+    <div class="acct" data-id="${a.id}">
+      <div class="acct-main">
+        <div class="acct-issuer">${esc(a.issuer || "—")}</div>
+        <div class="acct-name">${esc(a.account || "")}</div>
+        <button class="acct-code" data-copy="${a.id}" title="Kopyalamak için tıklayın">••• •••</button>
+      </div>
+      <div class="acct-side">
+        <div class="ring"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="16" fill="none" stroke="var(--raised2)" stroke-width="4"/><circle class="ring-fg" cx="20" cy="20" r="16" fill="none" stroke="var(--accent)" stroke-width="4" stroke-linecap="round" stroke-dasharray="100.5" stroke-dashoffset="0"/></svg><span class="ring-txt"></span></div>
+        <div class="mini">
+          <button data-copy="${a.id}" title="Kopyala">${ICON_COPY}</button>
+          <button data-edit="${a.id}" title="Düzenle">${ICON_EDIT}</button>
+          <button data-del="${a.id}" title="Sil">${ICON_DEL}</button>
+        </div>
+      </div>
+    </div>`).join("");
+  $("list").querySelectorAll("[data-copy]").forEach(b => b.addEventListener("click", ()=> copyCode(b.getAttribute("data-copy"))));
+  $("list").querySelectorAll("[data-edit]").forEach(b => b.addEventListener("click", ()=> openAdd(b.getAttribute("data-edit"))));
+  $("list").querySelectorAll("[data-del]").forEach(b => b.addEventListener("click", ()=> delAccount(b.getAttribute("data-del"))));
+  tick();
+}
+const fmtCode = c => c.length === 6 ? c.slice(0,3) + " " + c.slice(3) : c.slice(0,4) + " " + c.slice(4);
+async function tick(){
+  if(!master) return;
+  const ms = prefs.autolock > 0 ? prefs.autolock * 60000 : 0;
+  if(ms && Date.now() - lastActivity > ms){ lock(); return; }
+  const now = new Date();
+  $("clock").textContent = `Cihaz saati: ${now.toLocaleTimeString("tr-TR")} — kodlar cihaz saatine göre üretilir; saat doğru olmalıdır.`;
+  for(const a of accounts){
+    const el = document.querySelector(`.acct[data-id="${a.id}"]`);
+    if(!el) continue;
+    const period = a.period || 30;
+    const left = period - (Math.floor(Date.now()/1000) % period);
+    const codeEl = el.querySelector(".acct-code");
+    const code = await T.totp(a.secret, { digits:a.digits, period, algorithm:a.algorithm });
+    const masked = prefs.hide && !revealed.has(a.id);
+    codeEl.textContent = masked ? "••• •••" : fmtCode(code);
+    codeEl.classList.toggle("masked", masked);
+    codeEl.classList.toggle("warn", !masked && left <= 5);
+    el.querySelector(".ring-fg").setAttribute("stroke-dashoffset", String(100.5 * (1 - left/period)));
+    el.querySelector(".ring-fg").setAttribute("stroke", left <= 5 ? "var(--warn)" : "var(--accent)");
+    el.querySelector(".ring-txt").textContent = left;
+  }
+}
+async function copyCode(id){
+  const a = accounts.find(x => x.id === id); if(!a) return;
+  if(prefs.hide && !revealed.has(id)){ revealed.add(id); setTimeout(()=>{ revealed.delete(id); tick(); }, 15000); tick(); }
+  const code = await T.totp(a.secret, { digits:a.digits, period:a.period, algorithm:a.algorithm });
+  try{ await navigator.clipboard.writeText(code); toast("Kod kopyalandı"); setTimeout(()=>{ navigator.clipboard.writeText("").catch(()=>{}); }, 30000); }
+  catch(e){ toast("Kopyalanamadı — kodu elle yazın"); }
+}
+async function delAccount(id){
+  const a = accounts.find(x => x.id === id); if(!a) return;
+  if(!confirm(`"${a.issuer} · ${a.account}" silinecek. Bu hesapla girişte kod üretemezsiniz. Emin misiniz?`)) return;
+  accounts = accounts.filter(x => x.id !== id);
+  await persist(); renderList(); toast("Hesap silindi");
+}
+
+/* ---------------- Hesap ekle / düzenle ---------------- */
+let editingId = null, addTab = "uri";
+function setTab(t){
+  addTab = t;
+  document.querySelectorAll("#dlgAdd .tab").forEach(b => b.classList.toggle("active", b.getAttribute("data-tab") === t));
+  document.querySelectorAll("#dlgAdd [data-pane]").forEach(p => p.classList.toggle("hidden", p.getAttribute("data-pane") !== t));
+  updatePreview();
+}
+function openAdd(id){
+  editingId = id || null;
+  const a = id ? accounts.find(x => x.id === id) : null;
+  $("addTitle").textContent = a ? "Hesabı Düzenle" : "Hesap Ekle";
+  $("addUri").value = "";
+  $("addIssuer").value = a ? a.issuer : ""; $("addAccount").value = a ? a.account : "";
+  $("addSecret").value = a ? a.secret : ""; $("addDigits").value = String(a ? a.digits : 6);
+  $("addPeriod").value = String(a ? a.period : 30); $("addAlg").value = a ? a.algorithm : "SHA1";
+  $("addErr").textContent = ""; $("addPreview").textContent = "";
+  document.querySelector('#dlgAdd .tab[data-tab="uri"]').classList.toggle("hidden", !!a);
+  setTab(a ? "manual" : "uri");
+  $("dlgAdd").classList.remove("hidden");
+  setTimeout(()=> (a ? $("addIssuer") : $("addUri")).focus(), 50);
+}
+function readAddForm(){
+  if(addTab === "uri"){
+    const raw = $("addUri").value.trim();
+    if(!raw) throw new Error("Bağlantıyı yapıştırın.");
+    return T.parseOtpauth(raw);
+  }
+  const secret = $("addSecret").value.toUpperCase().replace(/[\s-]/g, "");
+  if(!secret) throw new Error("Gizli anahtarı girin.");
+  T.base32Decode(secret);
+  if(T.base32Decode(secret).length < 10) throw new Error("Anahtar çok kısa (en az 16 Base32 karakter).");
+  return { issuer:$("addIssuer").value.trim(), account:$("addAccount").value.trim(), secret,
+    digits:parseInt($("addDigits").value,10), period:parseInt($("addPeriod").value,10), algorithm:$("addAlg").value };
+}
+async function updatePreview(){
+  try{
+    const o = readAddForm();
+    const c = await T.totp(o.secret, { digits:o.digits, period:o.period, algorithm:o.algorithm });
+    $("addPreview").textContent = `${o.issuer || "—"} · ${o.account || "—"} → şu anki kod: ${fmtCode(c)}`;
+    $("addErr").textContent = "";
+  }catch(e){ $("addPreview").textContent = ""; }
+}
+async function saveAdd(){
+  let o;
+  try{ o = readAddForm(); }catch(e){ $("addErr").textContent = e.message; return; }
+  if(!o.issuer && !o.account){ $("addErr").textContent = "Hizmet veya hesap adı girin."; return; }
+  if(editingId){
+    const a = accounts.find(x => x.id === editingId);
+    Object.assign(a, o);
+  } else {
+    if(accounts.some(x => x.secret === o.secret)){ $("addErr").textContent = "Bu anahtar zaten kayıtlı."; return; }
+    accounts.push(Object.assign({ id: "a" + Math.random().toString(36).slice(2,10), added: new Date().toISOString() }, o));
+  }
+  await persist();
+  $("dlgAdd").classList.add("hidden");
+  renderList(); toast(editingId ? "Hesap güncellendi" : "Hesap eklendi");
+}
+
+/* ---------------- Ayarlar ---------------- */
+function openSettings(){
+  $("setAutolock").value = String(prefs.autolock);
+  $("setHide").checked = !!prefs.hide;
+  $("chgPwBox").classList.add("hidden");
+  $("setVersion").textContent = APP_CHANGELOG.map(c => `v${c.v} (${c.date}) — ${c.notes}`).join(" ");
+  $("dlgSettings").classList.remove("hidden");
+}
+function download(blob, name){
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; a.style.display = "none";
+  document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 4000);
+}
+async function exportBackup(){
+  const box = await T.sealText(JSON.stringify({ accounts, exportedAt:new Date().toISOString() }), master);
+  download(new Blob([JSON.stringify({ type:"qa_authenticator_backup", version:APP_VERSION, box })], {type:"application/json"}),
+    `Kimlik_Dogrulayici_Yedek_${new Date().toISOString().slice(0,10)}.json`);
+  toast("Şifreli yedek indirildi");
+}
+function importBackup(file){
+  const r = new FileReader();
+  r.onload = async ()=>{
+    try{
+      const d = JSON.parse(r.result);
+      if(d.type !== "qa_authenticator_backup") throw new Error("Bu dosya bir Kimlik Doğrulayıcı yedeği değil.");
+      const pw = prompt("Yedeğin oluşturulduğu ana parolayı girin:");
+      if(pw == null) return;
+      const data = JSON.parse(await T.openText(d.box, pw));
+      const incoming = data.accounts || [];
+      if(!master){ // kurulum ekranından geri yükleme: yedeğin parolası ana parola olur
+        master = pw; accounts = incoming;
+      } else {
+        let added = 0;
+        incoming.forEach(a => { if(!accounts.some(x => x.secret === a.secret)){ accounts.push(a); added++; } });
+        toast(`${added} hesap eklendi`);
+      }
+      await persist();
+      $("dlgSettings").classList.add("hidden");
+      enterMain();
+    }catch(e){ alert("Yedek yüklenemedi: " + e.message); }
+  };
+  r.readAsText(file);
+}
+async function changePw(){
+  const o = $("chgOld").value, n = $("chgNew").value, n2 = $("chgNew2").value;
+  if(o !== master){ $("chgErr").textContent = "Mevcut parola hatalı."; return; }
+  if(n.length < 8){ $("chgErr").textContent = "Yeni parola en az 8 karakter olmalı."; return; }
+  if(n !== n2){ $("chgErr").textContent = "Yeni parolalar eşleşmiyor."; return; }
+  master = n; await persist();
+  $("chgOld").value = $("chgNew").value = $("chgNew2").value = ""; $("chgErr").textContent = "";
+  $("chgPwBox").classList.add("hidden"); toast("Ana parola güncellendi");
+}
+function wipe(){
+  if(!confirm("Kasadaki tüm hesaplar bu tarayıcıdan kalıcı olarak silinecek. Yedeğiniz yoksa bu hesaplar için kod üretemezsiniz. Devam edilsin mi?")) return;
+  localStorage.removeItem(LS_VAULT);
+  master = null; accounts = [];
+  clearInterval(tickTimer);
+  $("dlgSettings").classList.add("hidden");
+  show("scrSetup");
+}
+
+/* ---------------- Başlatma ---------------- */
+function init(){
+  $("ver").textContent = "v" + APP_VERSION;
+  $("ver").title = APP_CHANGELOG.map(c => `v${c.v} (${c.date}): ${c.notes}`).join("\n");
+  loadPrefs(); applyTheme();
+  if(!window.crypto || !crypto.subtle){ document.body.innerHTML = "<p style='padding:24px'>Bu tarayıcı Web Crypto desteklemiyor. Güncel bir Chrome, Edge veya Firefox kullanın.</p>"; return; }
+
+  $("btnSetup").onclick = doSetup;
+  $("setupPw2").addEventListener("keydown", e => { if(e.key === "Enter") doSetup(); });
+  $("btnUnlock").onclick = doUnlock;
+  $("lockPw").addEventListener("keydown", e => { if(e.key === "Enter") doUnlock(); });
+  $("btnLock").onclick = lock;
+  $("btnAdd").onclick = ()=> openAdd(); $("btnAddEmpty").onclick = ()=> openAdd();
+  $("btnAddCancel").onclick = ()=> $("dlgAdd").classList.add("hidden");
+  $("btnAddSave").onclick = saveAdd;
+  document.querySelectorAll("#dlgAdd .tab").forEach(b => b.onclick = ()=> setTab(b.getAttribute("data-tab")));
+  ["addUri","addIssuer","addAccount","addSecret","addDigits","addPeriod","addAlg"].forEach(id => $(id).addEventListener("input", updatePreview));
+  $("btnSettings").onclick = openSettings;
+  $("btnSettingsClose").onclick = ()=> $("dlgSettings").classList.add("hidden");
+  $("setAutolock").onchange = ()=>{ prefs.autolock = parseInt($("setAutolock").value,10); savePrefs(); };
+  $("setHide").onchange = ()=>{ prefs.hide = $("setHide").checked; savePrefs(); revealed.clear(); tick(); };
+  $("btnExport").onclick = exportBackup;
+  $("btnImport").onclick = ()=> $("fileImport").click();
+  $("btnSetupImport").onclick = ()=> $("fileImport").click();
+  $("fileImport").onchange = e => { const f = e.target.files[0]; if(f) importBackup(f); e.target.value = ""; };
+  $("btnChangePw").onclick = ()=> $("chgPwBox").classList.toggle("hidden");
+  $("btnChgSave").onclick = changePw;
+  $("btnWipe").onclick = wipe;
+  $("search").addEventListener("input", renderList);
+  $("btnTheme").onclick = ()=>{
+    const dark = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim() === "#101019";
+    prefs.theme = dark ? "light" : "dark"; savePrefs(); applyTheme();
+  };
+  ["click","keydown","mousemove","touchstart"].forEach(ev => document.addEventListener(ev, ()=>{ lastActivity = Date.now(); }, { passive:true }));
+
+  if(readVault()) lock(); else show("scrSetup");
+}
+document.addEventListener("DOMContentLoaded", init);
+})();
+
+</script>
+</body>
+</html>

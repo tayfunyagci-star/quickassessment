@@ -1,0 +1,123 @@
+<div class="app-version" id="ver">v1.0</div>
+
+<!-- Kurulum -->
+<section id="scrSetup" class="screen hidden">
+  <div class="card narrow">
+    <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><circle cx="12" cy="11" r="2.2"/><path d="M12 13.2V16"/></svg></div>
+    <h1>Kimlik Doğrulayıcı</h1>
+    <p class="sub">Tek kullanımlık doğrulama kodları (TOTP) üretir. Hesaplarınız bu tarayıcıda, belirleyeceğiniz ana parolayla <b>AES-256</b> şifrelenmiş olarak saklanır.</p>
+    <label>Ana parola (en az 8 karakter)</label>
+    <input type="password" id="setupPw" autocomplete="new-password">
+    <label>Ana parola (tekrar)</label>
+    <input type="password" id="setupPw2" autocomplete="new-password">
+    <div class="err" id="setupErr"></div>
+    <button class="btn primary wide" id="btnSetup">Kasayı Oluştur</button>
+    <p class="note">Ana parola unutulursa kasa açılamaz; kodları yeniden üretmek için hesapları tekrar eklemeniz gerekir. Yedek almanız önerilir.</p>
+    <button class="link" id="btnSetupImport">Yedekten geri yükle</button>
+  </div>
+</section>
+
+<!-- Kilit -->
+<section id="scrLock" class="screen hidden">
+  <div class="card narrow">
+    <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></div>
+    <h1>Kasa Kilitli</h1>
+    <p class="sub">Kodları görmek için ana parolanızı girin.</p>
+    <input type="password" id="lockPw" autocomplete="current-password" placeholder="Ana parola">
+    <div class="err" id="lockErr"></div>
+    <button class="btn primary wide" id="btnUnlock">Kilidi Aç</button>
+  </div>
+</section>
+
+<!-- Ana ekran -->
+<section id="scrMain" class="screen hidden">
+  <header class="topbar">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><circle cx="12" cy="11" r="2.2"/><path d="M12 13.2V16"/></svg>
+      <span>Kimlik Doğrulayıcı</span>
+    </div>
+    <div class="actions">
+      <button class="icon" id="btnAdd" title="Hesap ekle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+      <button class="icon" id="btnSettings" title="Ayarlar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg></button>
+      <button class="icon" id="btnTheme" title="Tema"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg></button>
+      <button class="icon" id="btnLock" title="Kilitle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></button>
+    </div>
+  </header>
+  <div class="clock" id="clock"></div>
+  <input type="search" id="search" class="search hidden" placeholder="Hesap ara">
+  <div id="list" class="list"></div>
+  <div id="empty" class="empty hidden">
+    <p>Henüz hesap yok.</p>
+    <button class="btn primary" id="btnAddEmpty">Hesap Ekle</button>
+  </div>
+</section>
+
+<!-- Hesap ekle / düzenle -->
+<div id="dlgAdd" class="modal hidden">
+  <div class="card">
+    <h2 id="addTitle">Hesap Ekle</h2>
+    <div class="tabs">
+      <button class="tab active" data-tab="uri">Bağlantı ile</button>
+      <button class="tab" data-tab="manual">Elle</button>
+    </div>
+    <div data-pane="uri">
+      <label>otpauth:// bağlantısı</label>
+      <textarea id="addUri" rows="3" placeholder="otpauth://totp/Kurum:hesap?secret=...&issuer=..."></textarea>
+    </div>
+    <div data-pane="manual" class="hidden">
+      <label>Hizmet / kurum</label><input type="text" id="addIssuer" placeholder="ör. Olgunluk Değerlendirme">
+      <label>Hesap</label><input type="text" id="addAccount" placeholder="ör. Yönetici">
+      <label>Gizli anahtar (Base32)</label><input type="text" id="addSecret" class="mono" placeholder="ABCD EFGH ...">
+      <div class="row3">
+        <div><label>Hane</label><select id="addDigits"><option>6</option><option>8</option></select></div>
+        <div><label>Süre (sn)</label><select id="addPeriod"><option>30</option><option>60</option></select></div>
+        <div><label>Algoritma</label><select id="addAlg"><option>SHA1</option><option>SHA256</option><option>SHA512</option></select></div>
+      </div>
+    </div>
+    <div class="preview" id="addPreview"></div>
+    <div class="err" id="addErr"></div>
+    <div class="dlg-actions">
+      <button class="btn" id="btnAddCancel">Vazgeç</button>
+      <button class="btn primary" id="btnAddSave">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- Ayarlar -->
+<div id="dlgSettings" class="modal hidden">
+  <div class="card">
+    <h2>Ayarlar</h2>
+    <div class="set-row">
+      <div><b>Otomatik kilit</b><span>Hareketsizlik süresi sonunda kasa kilitlenir.</span></div>
+      <select id="setAutolock"><option value="1">1 dk</option><option value="5">5 dk</option><option value="15">15 dk</option><option value="0">Kapalı</option></select>
+    </div>
+    <div class="set-row">
+      <div><b>Kodları gizle</b><span>Kodlar yalnızca üzerine tıklayınca görünür.</span></div>
+      <input type="checkbox" id="setHide">
+    </div>
+    <div class="set-row">
+      <div><b>Şifreli yedek</b><span>Hesapları ana parolayla şifreli bir dosyaya aktarır / geri yükler.</span></div>
+      <div class="btns"><button class="btn sm" id="btnExport">Dışa Aktar</button><button class="btn sm" id="btnImport">İçe Aktar</button></div>
+    </div>
+    <div class="set-row">
+      <div><b>Ana parolayı değiştir</b><span>Kasa yeni parolayla yeniden şifrelenir.</span></div>
+      <button class="btn sm" id="btnChangePw">Değiştir</button>
+    </div>
+    <div id="chgPwBox" class="hidden">
+      <label>Mevcut parola</label><input type="password" id="chgOld">
+      <label>Yeni parola (en az 8 karakter)</label><input type="password" id="chgNew">
+      <label>Yeni parola (tekrar)</label><input type="password" id="chgNew2">
+      <div class="err" id="chgErr"></div>
+      <button class="btn primary sm" id="btnChgSave">Parolayı Güncelle</button>
+    </div>
+    <div class="set-row">
+      <div><b>Tüm verileri sil</b><span>Kasayı bu tarayıcıdan kalıcı olarak siler.</span></div>
+      <button class="btn sm danger" id="btnWipe">Sil</button>
+    </div>
+    <p class="note" id="setVersion"></p>
+    <div class="dlg-actions"><button class="btn primary" id="btnSettingsClose">Kapat</button></div>
+  </div>
+</div>
+
+<input type="file" id="fileImport" accept=".json" class="hidden">
+<div id="toast" class="toast"></div>

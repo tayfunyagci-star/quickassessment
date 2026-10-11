@@ -1,0 +1,142 @@
+/* arayuz-tasarim-sistemi / belirtecler.css — olduğu gibi (fontlar build.py'de gömülür) */
+/* ========================================================== Belirteçler */
+
+:root {
+  --bg: #12161b;
+  --bg-blueprint-line: rgba(94, 168, 216, 0.055);
+  --bg-panel: #171c22;
+  --bg-raised: #1c232b;
+  --bg-raised-2: #212a33;
+  --bg-input: #10151a;
+  --border: #2b3540;
+  --border-soft: #212a33;
+  --border-hover: #3a4653;
+  --text: #e9eef3;
+  --text-dim: #9aabb8;
+  --text-faint: #5c6b78;
+
+  --brand: #4fa6d8;
+  --brand-dim: rgba(79, 166, 216, 0.13);
+  --brand-line: rgba(79, 166, 216, 0.35);
+  --on-brand: #0d1319;
+
+  --amber: #eea23a;
+  --amber-dim: rgba(238, 162, 58, 0.13);
+  --green: #45bb7c;
+  --green-dim: rgba(69, 187, 124, 0.13);
+  --red: #ea5b57;
+  --red-dim: rgba(234, 91, 87, 0.13);
+  --gray: #7c8a97;
+  --gray-dim: rgba(124, 138, 151, 0.13);
+
+  --scrollbar-thumb: #2c3540;
+  --scrollbar-thumb-hover: #38434f;
+  --error-text: #ffc4c1;
+  --error-text-strong: #ffffff;
+
+  --radius-s: 6px;
+  --radius-m: 10px;
+  --radius-l: 16px;
+
+  --font-display: "Space Grotesk", "IBM Plex Sans", sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  --golge-1: 0 10px 30px -18px rgba(0, 0, 0, .5);
+  --golge-2: 0 16px 44px -18px rgba(0, 0, 0, .55);
+
+  /* Eski takma adlar: şablon sözlüğü bu adlarla yazıldı. */
+  --metin: var(--text);
+  --soluk: var(--text-dim);
+  --cizgi: var(--border);
+  --cizgi-koyu: var(--border-hover);
+  --zemin: var(--bg);
+  --kart: var(--bg-panel);
+  --vurgu: var(--brand);
+  --yuvarlak: var(--radius-m);
+  --basarili-zemin: var(--green-dim);
+  --basarili-cizgi: var(--green);
+  --hata-zemin: var(--red-dim);
+  --hata-cizgi: var(--red);
+  --uyari-zemin: var(--amber-dim);
+  --uyari-cizgi: var(--amber);
+  --seviye1: var(--green);
+  --seviye2: var(--amber);
+  --seviye3: var(--red);
+
+  /* Boş/eksik alan işareti: koyu temada çok hafif sıcak bir ton. */
+  --bos-alan-zemin: rgba(238, 162, 58, 0.055);
+  --bos-alan-cizgi: rgba(238, 162, 58, 0.30);
+}
+
+html[data-theme="light"] {
+  --bg: #eef1f4;
+  --bg-blueprint-line: rgba(48, 90, 120, 0.06);
+  --bg-panel: #ffffff;
+  --bg-raised: #f3f5f7;
+  --bg-raised-2: #e7ebee;
+  --bg-input: #ffffff;
+  --border: #d7dde2;
+  --border-soft: #e5e9ec;
+  --border-hover: #b7c1ca;
+  --text: #1b2430;
+  --text-dim: #55636e;
+  --text-faint: #8a97a2;
+
+  --brand: #1c7ab8;
+  --brand-dim: rgba(28, 122, 184, 0.09);
+  --brand-line: rgba(28, 122, 184, 0.35);
+  --on-brand: #ffffff;
+
+  --scrollbar-thumb: #c7ced4;
+  --scrollbar-thumb-hover: #b3bcc4;
+  --error-text: #b3261e;
+  --error-text-strong: #7a1a15;
+
+  --amber: #9c6310;
+  --green: #127a48;
+  --red: #c0322d;
+  --gray: #55636e;
+
+  --golge-1: 0 1px 2px rgba(15, 33, 49, .06), 0 1px 3px rgba(15, 33, 49, .04);
+  --golge-2: 0 2px 4px rgba(15, 33, 49, .07), 0 4px 12px rgba(15, 33, 49, .06);
+
+  /* Aydınlık temada pastel kum tonu: eksik alan görünür ama sırıtmaz. */
+  --bos-alan-zemin: #fdf6e9;
+  --bos-alan-cizgi: #e8d5ae;
+}
+
+/* ============================================================== Taban */
+
+* { box-sizing: border-box; }
+html { font-size: 15px; }
+
+body {
+  margin: 0;
+  background:
+    linear-gradient(var(--bg-blueprint-line) 1px, transparent 1px) 0 0 / 38px 38px,
+    linear-gradient(90deg, var(--bg-blueprint-line) 1px, transparent 1px) 0 0 / 38px 38px,
+    var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+::selection { background: var(--brand-dim); color: var(--text); }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 8px; border: 2px solid var(--bg); }
+::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
+
+a { color: var(--brand); }
+button { font-family: inherit; }
+
+h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; letter-spacing: -0.01em; }
+h1 { font-size: 1.45rem; margin: 0 0 4px; }
+h2 { font-size: 1.08rem; margin: 0 0 10px; }
+h3 { font-size: .98rem; margin: 18px 0 8px; }
+
+:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; border-radius: 4px; }
+
