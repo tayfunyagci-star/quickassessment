@@ -24,7 +24,7 @@ QA_ADMIN_PASSWORD='uzun-ve-tahmin-edilemez-bir-parola' npm run build
 | `_build/Siber_Olgunluk_Analiz_Paneli.html` | Analiz Paneli (~1,3 MB). Danışmanlara bu dosya verilir. |
 | `_build/Kimlik_Dogrulayici.html` | İki adımlı doğrulama kodlarını üreten çevrimdışı uygulama. |
 
-- **`QA_ADMIN_PASSWORD` zorunludur** ve en az 8 karakter olmalıdır; aksi hâlde build hata verip durur. Gerçek kullanım için 12+ karakterlik güçlü bir parola seçin (12'den kısa parolada build uyarı verir).
+- **`QA_ADMIN_PASSWORD` zorunludur** ve en az 8 karakter olmalıdır; aksi hâlde build hata verip durur. Kısa parolada büyük/küçük harf, rakam ve işaret karıştırın (12'den kısa parolada build uyarı verir).
   - Parola dosyaya hiçbir biçimde (açık metin ya da özet olarak) yazılmaz.
   - Panelin tüm içeriği bu parolayla şifrelenir: PBKDF2-SHA256 600 000 tur → AES-256-GCM.
   - Parolayı repoya, commit mesajına veya CI günlüğüne yazmayın; CI'da secret olarak tanımlayın.
@@ -46,7 +46,7 @@ python dagitim_olustur.py
 
 Açılan pencerede yapmanız gerekenler:
 
-1. Parolayı iki kez girin (en az 12 karakter). Güç göstergesi parolayı değerlendirir.
+1. Parolayı iki kez girin (en az 8 karakter). Güç göstergesi parolayı değerlendirir. Kısa parolada büyük/küçük harf, rakam ve işaret karıştırın.
 2. **Dağıtımı Oluştur** düğmesine basın.
 
 Betik şunları kendisi yapar:
@@ -83,7 +83,7 @@ Sürüm tek kaynaktan yönetilir: `src/panel/version.js` (`APP_VERSION` + `APP_C
 3. Kurulumdan sonra girişte parolaya ek olarak 6 haneli kod istenir. Kodlar TOTP'dir (RFC 6238, SHA1, 30 sn, ±1 adım) ve aynı kod ikinci kez kullanılamaz.
 4. Anahtarı yenilemek veya iki adımlı doğrulamayı kapatmak da **Güvenlik** bölümünden yapılır ve yine yeni bir dosya indirir.
 
-> Çevrimdışı tek dosyada ikinci adım bir **işletim kontrolüdür**. Dosyayı ve parolayı birlikte ele geçiren birine karşı asıl koruma parolayla yapılan şifrelemedir. Bu yüzden güçlü bir parola seçin.
+> Çevrimdışı tek dosyada ikinci adım bir **işletim kontrolüdür**: girişte kod ister, ama dosyanın şifrelemesi yalnızca parolaya dayanır. Dosya başkasının eline geçerse koruma tamamen parolaya kalır; bu yüzden tahmin edilemez bir parola seçin.
 
 ### Anket üretimi
 

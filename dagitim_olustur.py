@@ -26,7 +26,7 @@ import threading
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 DAGITIM = os.path.join(ROOT, "dagitim")
-MIN_LEN = 12
+MIN_LEN = 8
 WIN = os.name == "nt"
 NPM = "npm.cmd" if WIN else "npm"
 NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0) if WIN else 0
@@ -82,12 +82,21 @@ def app_version():
         return "x"
 
 
+# Yaygın kalıplar: ardışık rakam/harf, klavye dizileri, tekrarlanan karakter, bilinen kelimeler
+PATTERN = re.compile(r"0123|1234|2345|3456|4567|5678|6789|9876|8765|7654|6543|5432|4321|abcd|qwer|asdf|zxcv|"
+                     r"(.)\1\1\1|parola|sifre|şifre|password|admin|scale|test|deneme")
+
+
 def strength(pw):
     """Kaba parola gücü: (etiket, 0–4)."""
     if not pw:
         return "—", 0
     kinds = sum(bool(re.search(r, pw)) for r in (r"[a-zçğıöşü]", r"[A-ZÇĞİÖŞÜ]", r"\d", r"[^\w]"))
     score = (len(pw) >= 12) + (len(pw) >= 16) + (kinds >= 3) + (kinds == 4)
+    if len(pw) < 12 and kinds < 3:
+        score = 0                                                   # kısa ve tek düze → zayıf
+    if PATTERN.search(pw.lower()):
+        return "zayıf (tahmin edilebilir kalıp)", 0
     if len(pw) < MIN_LEN:
         return "çok kısa (en az %d karakter)" % MIN_LEN, 0
     return ["zayıf", "orta", "iyi", "güçlü", "çok güçlü"][score], score
@@ -196,14 +205,17 @@ def gui():
     ttk.Label(frm, text="Parola (tekrar)").grid(row=3, column=0, sticky="w")
     e2 = ttk.Entry(frm, textvariable=pw2, show="•", width=40)
     e2.grid(row=3, column=1, sticky="we", pady=3)
+    ttk.Label(frm, text="En az %d karakter. Kısa parolada büyük/küçük harf, rakam ve işaret karıştırın; "
+                        "sözlükteki kelimeler ve 123456 gibi kalıplar kolay tahmin edilir." % MIN_LEN,
+              wraplength=460, foreground="#5B6472", font=("Segoe UI", 8)).grid(row=4, column=1, columnspan=2, sticky="w", pady=(2, 6))
     lbl_str = ttk.Label(frm, text="Güç: —", foreground="#5B6472")
     lbl_str.grid(row=2, column=2, sticky="w", padx=10)
 
     def on_show():
         ch = "" if show.get() else "•"
         e1.configure(show=ch); e2.configure(show=ch)
-    ttk.Checkbutton(frm, text="Parolayı göster", variable=show, command=on_show).grid(row=4, column=1, sticky="w")
-    ttk.Checkbutton(frm, text="Bağımlılıkları yeniden kur (npm ci)", variable=reinst).grid(row=5, column=1, sticky="w")
+    ttk.Checkbutton(frm, text="Parolayı göster", variable=show, command=on_show).grid(row=5, column=1, sticky="w")
+    ttk.Checkbutton(frm, text="Bağımlılıkları yeniden kur (npm ci)", variable=reinst).grid(row=6, column=1, sticky="w")
 
     def on_pw(*_):
         label, sc = strength(pw.get())
@@ -212,15 +224,15 @@ def gui():
     pw.trace_add("write", on_pw)
 
     btn = ttk.Button(frm, text="Dağıtımı Oluştur")
-    btn.grid(row=6, column=1, sticky="w", pady=(12, 8))
+    btn.grid(row=7, column=1, sticky="w", pady=(12, 8))
     prog = ttk.Progressbar(frm, mode="indeterminate")
-    prog.grid(row=6, column=2, sticky="we", padx=10)
+    prog.grid(row=7, column=2, sticky="we", padx=10)
 
     logbox = tk.Text(frm, height=14, wrap="word", font=("Consolas" if WIN else "Courier", 9), state="disabled",
                      background="#F5F7FA", relief="flat")
-    logbox.grid(row=7, column=0, columnspan=3, sticky="nsew", pady=(6, 0))
+    logbox.grid(row=8, column=0, columnspan=3, sticky="nsew", pady=(6, 0))
     frm.columnconfigure(1, weight=1)
-    frm.rowconfigure(7, weight=1)
+    frm.rowconfigure(8, weight=1)
 
     q = queue.Queue()
 
