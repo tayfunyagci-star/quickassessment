@@ -1,0 +1,197 @@
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="topbar-home" href="https://scaleteknoloji.com">&larr; Scale Teknoloji Grup</a>
+    <span class="topbar-sag"><span class="accent">7545 sayılı Kanun yürürlükte &middot; Yıllık denetim zorunlu</span><button type="button" class="tema-btn" id="btnTema" title="Açık / koyu tema" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg><span id="temaLbl">Koyu</span></button></span>
+  </div>
+</div>
+
+
+<!-- Devam eden değerlendirme modalı -->
+<div id="resumeModal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <h2>Devam eden bir değerlendirmeniz var</h2>
+    <p>Yarım kalmış bir anketiniz bulundu. Kaldığınız yerden devam etmek ister misiniz?</p>
+    <div class="modal-actions">
+      <button class="btn" id="btnResumeFresh">Yeniden Başla</button>
+      <button class="btn btn-primary" id="btnResumeContinue">Devam Et</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ LANDING ============ -->
+<div id="landing">
+  <header class="hero" style="padding:64px 0 40px">
+    <div class="container">
+      <div class="hero-grid" style="align-items:start;margin-bottom:36px">
+        <div>
+          <div class="ref-row">
+            <p class="ref" style="margin-bottom:0">Hızlı Değerlendirme</p>
+            <span class="tax-pill" id="taxPill">—</span>
+          </div>
+          <h1 style="max-width:20ch">Kurumunuzun siber güvenlik olgunluğunu birlikte ölçelim</h1>
+          <p class="lede" id="leadText"></p>
+        </div>
+
+        <!-- Ankete giriş kartı — hero'nun sağında -->
+        <aside class="start-card">
+          <p class="ref">Başlayın</p>
+          <h2>Anketi şimdi doldurun</h2>
+          <p>Kurum adı yalnızca rapor başlığında kullanılır; anket boyunca sunucuya gönderilmez.</p>
+          <input type="text" class="org-input" id="orgNameInput" placeholder="Kurum adınız">
+          <button class="btn btn-primary" id="btnStart">
+            Anketi Başlat
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+          <p class="note" id="startNote">İlerlemeniz cihazınızda saklanır; istediğiniz zaman ara verip kaldığınız yerden devam edebilirsiniz.</p>
+        </aside>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card"><div class="num" id="statAreas">—</div><div class="lbl" id="statAreasLbl">Kontrol Alanı</div></div>
+        <div class="stat-card"><div class="num" id="statRange">—</div><div class="lbl">Kontrol Sorusu (cevaplarınıza göre değişir)</div><div class="sublbl" id="statRangeSub">—</div></div>
+        <div class="stat-card"><div class="num">3</div><div class="lbl">Her kontrol sorusu için boyut</div><div class="sublbl">İnsan · Süreç · Teknoloji</div></div>
+        <div class="stat-card"><div class="num" id="statTime">—</div><div class="lbl">Ortalama tamamlama süresi</div></div>
+      </div>
+    </div>
+  </header>
+
+  <section style="padding-top:0">
+    <div class="container">
+      <div class="section-head">
+        <p class="ref">Nasıl Çalışır?</p>
+        <h2>Anketi doldururken bilmeniz gerekenler</h2>
+      </div>
+      <div class="grid3">
+        <div class="card">
+          <div class="method-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg></div>
+          <h3 style="font-size:1rem">Uyarlanabilir Sorular</h3>
+          <p style="font-size:.92rem">Bir sonraki soruyu, verdiğiniz önceki cevaba göre belirliyoruz. Cevabınız yüksekse daha ileri olgunluk seviyesindeki bir kontrolü soruyor, düşükse temele iniyoruz.</p>
+        </div>
+        <div class="card">
+          <div class="method-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
+          <h3 style="font-size:1rem">Kaldığınız Yerden Devam</h3>
+          <p style="font-size:.92rem">Anketi bölerek doldurabilirsiniz; ilerlemeniz yalnızca kendi cihazınızda saklanır ve daha sonra kaldığınız yerden devam edebilirsiniz.</p>
+        </div>
+        <div class="card">
+          <div class="method-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></div>
+          <h3 style="font-size:1rem">Uçtan Uca Şifreleme</h3>
+          <p style="font-size:.92rem">Cevaplarınız <b>cihazınızdan çıkmadan önce</b> AES-256-GCM ile şifrelenir. Şifreli paketi bize iletirsiniz; açma şifresi yalnızca sizde kalır ve sunucuya hiçbir zaman gönderilmez.</p>
+        </div>
+      </div>
+
+      <div class="note" style="margin-top:22px">
+        <b>Anket sonunda ne oluyor?</b> Cevaplarınız cihazınızda şifrelenir ve şifreli dosya bilgisayarınıza iner.
+        Dosyayı danışman ekibimize e-postayla gönderirsiniz. Paketi açan şifre yalnızca ekranınızda gösterilir —
+        onu bize <b>farklı bir kanaldan</b> (telefon veya SMS) iletirsiniz. Böylece dosya ve şifre hiçbir zaman aynı
+        kanaldan taşınmaz. Bu sayfa internete bağlanmaz; cevaplarınız cihazınızdan kendiliğinden çıkmaz.
+      </div>
+    </div>
+  </section>
+
+  <section class="mist">
+    <div class="container">
+      <p class="ref" style="justify-content:center;display:flex">Kapsanan Kontrol Alanları</p>
+      <div class="trust-strip" id="funcStrip" style="justify-content:center"></div>
+    </div>
+  </section>
+</div>
+
+<!-- ============ KAPSAM ============ -->
+<section id="scopeScreen" class="hidden">
+  <div class="container" style="max-width:720px">
+    <p class="ref">Adım 1 / 2 · Kapsam</p>
+    <h2>Önce kurumunuzun kapsamını belirleyelim</h2>
+    <p class="lede" style="font-size:.95rem">Aşağıdaki sorular, kurumunuzda karşılığı olmayan kontrol alanlarının anket dışında
+      bırakılmasını sağlar. Bir kontrol alanının tüm soruları elenirse o alan otomatik olarak kapsam dışı sayılır ve
+      skorlamaya girmez.</p>
+    <div id="scopeList" class="scope-list"></div>
+    <div id="scopeSummary" class="scope-summary"></div>
+    <div id="scopeEmpty" class="note warn hidden">Verdiğiniz cevaplarla kapsamda hiç kontrol alanı kalmadı. Devam edebilmek için en az bir kapsam sorusuna «Evet» demeniz gerekir.</div>
+    <div class="scope-actions">
+      <button class="btn btn-ghost" id="btnScopeBack">Geri</button>
+      <button class="btn btn-primary" id="btnScopeNext">Anketi Başlat
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ANKET ============ -->
+<section id="assessment" class="hidden">
+  <div class="assess-topbar">
+    <div class="assess-topbar-row">
+      <button class="btn-home" id="btnHomeFromAssess" title="Ana sayfa">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+      </button>
+      <div class="assess-progress-label" id="assessProgressLabel">Alan 1</div>
+    </div>
+    <div class="assess-progress-track"><div class="assess-progress-fill" id="assessProgressFill" style="width:0%"></div></div>
+    <div class="func-dots" id="funcDots"></div>
+  </div>
+  <div class="slide-viewport"><div id="slideCard"></div></div>
+</section>
+
+<!-- ============ TAMAMLANDI — 2 ADIM ============ -->
+<section id="clientDone" class="hidden">
+  <div class="done-wrap">
+    <div class="done-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></div>
+    <h1>Anket tamamlandı</h1>
+
+    <!-- ADIM 1 · İletişim -->
+    <div id="doneContact">
+      <p id="doneContactIntro">Sonuç raporunuzu size ulaştırabilmemiz için iletişim bilgileriniz şifreli pakete eklenir.
+         Ardından cevaplarınız cihazınızda şifrelenip bilgisayarınıza indirilecektir.</p>
+      <div class="c-field">
+        <label for="cEmail">Kurumsal e-posta</label>
+        <input type="email" id="cEmail" autocomplete="email" placeholder="ad.soyad@kurumunuz.com">
+      </div>
+      <div class="c-field">
+        <label for="cPhone">Telefon</label>
+        <input type="tel" id="cPhone" autocomplete="tel" placeholder="0(5xx) xxx xx xx">
+        <span class="c-sub">Şifreyi telefonla iletebilmeniz ve raporu birlikte gözden geçirebilmemiz için gereklidir.</span>
+      </div>
+      <label class="c-consent">
+        <input type="checkbox" id="cConsent">
+        <span>Kişisel verilerimin bu değerlendirme kapsamında işlenmesine ilişkin
+          <a href="https://infosec.scaleteknoloji.com/aydinlatma-metni.html" target="_blank" rel="noopener">Aydınlatma Metni</a>'ni okudum ve onaylıyorum.</span>
+      </label>
+      <div class="gate-err hidden" id="contactErr"></div>
+      <button class="btn btn-primary" id="btnEncrypt" style="width:100%;justify-content:center">Şifrele ve İndir</button>
+    </div>
+
+    <!-- ADIM 2 · Sonuç -->
+    <div id="doneFinal" class="hidden">
+      <p>Yanıtlarınız cihazınızda şifrelendi ve şifreli dosya indirildi. Aşağıdaki şifreyi not edin veya kopyalayın — dosyayı açmak için gereklidir.</p>
+      <div class="password-box">
+        <div class="password-box-label">Dosya Şifresi</div>
+        <div class="password-row">
+          <div class="password-box-value" id="clientPasswordOut">--------</div>
+          <button class="btn btn-ghost copy-btn" id="btnCopyPassword" style="padding:.55em 1em;font-size:.78rem" title="Şifreyi kopyala">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            <span id="copyBtnLabel">Kopyala</span>
+          </button>
+        </div>
+        <div class="password-box-warn"><b>Bu şifreyi dosyayla aynı kanaldan göndermeyin.</b> Şifre yalnızca bu ekranda gösterilir; sunucuya hiçbir zaman iletilmez.</div>
+      </div>
+      <div class="delivery-note" id="deliveryNote"></div>
+      <div class="done-actions">
+        <button class="btn btn-primary" id="btnRedownload">Dosyayı Tekrar İndir</button>
+      </div>
+      <button class="done-restart" id="btnClientRestart">Yeniden başlat</button>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-bottom">
+    <div class="container">
+      <span>© <span id="year"></span> Scale Teknoloji. Tüm hakları saklıdır.</span>
+      <span id="footMeta"></span>
+      <ul class="footer-legal">
+        <li><a href="https://infosec.scaleteknoloji.com/aydinlatma-metni.html" target="_blank" rel="noopener">Aydınlatma Metni</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+

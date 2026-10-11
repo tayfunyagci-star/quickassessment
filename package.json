@@ -1,0 +1,20 @@
+{
+  "name": "siber-olgunluk-analiz-paneli",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Scale Teknoloji — Siber Güvenlik Olgunluk Analiz Paneli (tek dosya, çevrimdışı)",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node tests/run.mjs"
+  },
+  "devDependencies": {
+    "@fontsource/ibm-plex-mono": "5.3.0",
+    "@fontsource/ibm-plex-sans": "5.3.0",
+    "@fontsource/space-grotesk": "5.3.0",
+    "jszip": "3.10.1",
+    "playwright": "1.56.1",
+    "qrcode-generator": "1.4.4",
+    "xlsx": "0.18.5"
+  }
+}
