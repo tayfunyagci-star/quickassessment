@@ -36,6 +36,27 @@ QA_ADMIN_PASSWORD='uzun-ve-tahmin-edilemez-bir-parola' npm run build
   - Ankette ağ erişimi izi aranır.
   - Kimlik Doğrulayıcı'da da aynı ağ izi taraması yapılır.
 
+### Dağıtım oluşturma (arayüzlü)
+
+Danışmanlara verilecek dosyayı üretmenin en kolay yolu repo kökündeki `dagitim_olustur.py` betiğidir. Windows'ta çift tıklayın ya da şu komutu çalıştırın:
+
+```
+python dagitim_olustur.py
+```
+
+Açılan pencerede yapmanız gerekenler:
+
+1. Parolayı iki kez girin (en az 12 karakter). Güç göstergesi parolayı değerlendirir.
+2. **Dağıtımı Oluştur** düğmesine basın.
+
+Betik şunları kendisi yapar:
+
+- Node.js'i denetler (20 veya üstü gerekir).
+- Gerekirse bağımlılıkları kurar (`npm ci`).
+- Paneli derleyip `dagitim/Analiz_Paneli_v<sürüm>_<tarih>/` klasörüne yazar: panel, Kimlik Doğrulayıcı ve `OKUBENI.txt`. İş bitince klasörü açar.
+
+Parola derlemeye yalnızca ortam değişkeniyle verilir. Hiçbir dosyaya, günlüğe ya da komut satırına yazılmaz; derleme sonunda çıktıda bulunmadığı ayrıca denetlenir. `dagitim/` klasörü git'e girmez. Pencere kullanmak istemezseniz konsol kipi de var: `python dagitim_olustur.py --konsol`.
+
 ### Repo kökündeki test derlemesi
 
 Geliştirme sürecinde repo kökündeki `Siber_Olgunluk_Analiz_Paneli.html` ve `Kimlik_Dogrulayici.html` her değişiklikte

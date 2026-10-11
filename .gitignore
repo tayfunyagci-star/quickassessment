@@ -1,2 +1,4 @@
 node_modules/
 _build/
+dagitim/
+__pycache__/
