@@ -38,7 +38,13 @@ QA_ADMIN_PASSWORD='uzun-ve-tahmin-edilemez-bir-parola' npm run build
 
 ### Dağıtım oluşturma (arayüzlü)
 
-Danışmanlara verilecek dosyayı üretmenin en kolay yolu repo kökündeki `dagitim_olustur.py` betiğidir. Windows'ta çift tıklayın ya da şu komutu çalıştırın:
+Danışmanlara verilecek dosyayı üretmenin en kolay yolu, repo kökündeki **`Dagitim_Olustur.bat`** dosyasına çift tıklamaktır.
+
+- Bu dosya `dagitim_olustur.py` penceresini konsol açmadan başlatır.
+- Python ya da Node.js kurulu değilse ne yapmanız gerektiğini yazar ve bekler.
+- Masaüstüne kısayol koymak için dosyaya sağ tıklayın, **Gönder → Masaüstü (kısayol oluştur)** seçin.
+
+Windows dışında ya da komut satırından şu komutla çalıştırabilirsiniz:
 
 ```
 python dagitim_olustur.py
