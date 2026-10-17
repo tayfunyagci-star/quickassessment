@@ -1,6 +1,7 @@
 """Dağıtım Oluştur — Analiz Paneli'ni kendi parolanızla derler.
 
 Çalıştırma (repo kökünde):
+    Windows: Dagitim_Olustur.bat dosyasına çift tıklayın (pencere konsolsuz açılır)
     python dagitim_olustur.py            → pencere açılır
     python dagitim_olustur.py --konsol   → pencere yerine konsolda parola sorar
 
